@@ -1,0 +1,27 @@
+name: neural_signal
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  # Core scientific stack
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  - seaborn
+  # Data I/O
+  - h5py
+  # Signal processing
+  - pywavelets
+  # Machine learning
+  - scikit-learn
+  # Jupyter
+  - jupyter
+  - ipykernel
+  - notebook
+  # Utilities
+  - tqdm
+  - pip
+  - pip:
+    - gdown
