@@ -8,7 +8,7 @@ Can we classify whether an animal is interacting socially vs. exploring alone ba
 
 ## Background
 
-Electrophysiology studies show that theta-band (4-7 Hz) power increases in the prefrontal cortex during social contexts (Tzilivaki et al. 2022, eLife). We test whether these spectral signatures are recoverable from calcium imaging data — a slower, indirect proxy for neural spiking — using signal processing techniques appropriate for the data's temporal resolution.
+Electrophysiology studies show that theta-band (4-7 Hz) power increases in the **prefrontal cortex** during social contexts (Tzilivaki et al. 2022, eLife). We test whether these spectral signatures are recoverable from calcium imaging data — a slower, indirect proxy for neural spiking — using signal processing techniques appropriate for the data's temporal resolution.
 
 ## Approach
 
