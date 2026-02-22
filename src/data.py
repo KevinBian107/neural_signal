@@ -15,6 +15,7 @@ FILES = {
     'calcium.00.h5':                 '1UthpsskvkHbKKDsbQjUxyVN4Xkd-ZJuN',
     'social_bouts.00.h5':            '1Mh8oGKNyKpT5WS0Wu92SULFFanvqmSMf',
     'SI3_2022_Entrance_Frames.xlsx': '1POpRqpA_QaWfZhxswQvLSs9uBnnHrmhZ',
+    'spatial_footprints.00.h5':      '1PYLeqT88IH_9JWNPwYaUC9WJVT2IqevL',
 }
 
 BEHAVIOR_KEYS = [
@@ -137,6 +138,23 @@ def align_all_sessions(imaging, behavior, entrances,
     session_df = pd.DataFrame(session_info)
     print(f'\nAligned {len(aligned_calcium)} / {n_sessions} sessions.')
     return aligned_calcium, aligned_behavior, session_info, session_df
+
+
+def load_spatial_footprints(data_dir=None):
+    """Load spatial footprints (A) and correlation image (Cn) for Session 0.
+
+    Returns dict with keys: A (n_neurons, 600, 600), Cn (600, 600), Fs.
+    """
+    data_dir = Path(data_dir) if data_dir else DATA_DIR
+    path = data_dir / 'spatial_footprints.00.h5'
+    with h5py.File(path, 'r') as f:
+        A_flat = f['A'][:]        # (n_neurons, 360000)
+        Cn = f['Cn'][:]           # (600, 600)
+        Fs = float(f['Fs'][:].flat[0])
+    n_neurons = A_flat.shape[0]
+    side = int(np.sqrt(A_flat.shape[1]))
+    A = A_flat.reshape(n_neurons, side, side)
+    return {'A': A, 'Cn': Cn, 'Fs': Fs, 'n_neurons': n_neurons}
 
 
 def get_epoch_durations(labels, fps):
