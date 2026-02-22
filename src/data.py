@@ -16,6 +16,8 @@ FILES = {
     'social_bouts.00.h5':            '1Mh8oGKNyKpT5WS0Wu92SULFFanvqmSMf',
     'SI3_2022_Entrance_Frames.xlsx': '1POpRqpA_QaWfZhxswQvLSs9uBnnHrmhZ',
     'spatial_footprints.00.h5':      '1PYLeqT88IH_9JWNPwYaUC9WJVT2IqevL',
+    'behavior_video.mp4':            '1SAfse1kJU4AGk8AFxbt34GsElpUxCFMj',
+    'behavior_tracking.slp':         '1ROllUZbwevCP3oAjSNwbxq-zVotzzxJ4',
 }
 
 BEHAVIOR_KEYS = [
