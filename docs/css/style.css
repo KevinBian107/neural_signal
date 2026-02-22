@@ -323,7 +323,7 @@ section:nth-child(even) {
 
 /* --- Conclusion --- */
 .conclusion {
-  background: var(--hero-bg);
+  background: var(--hero-bg) !important;
   color: #fff;
   padding: 5rem 0;
 }

@@ -2,6 +2,8 @@
 
 **COGS 118C — Signal Processing Course Project**
 
+**[Project Website](https://kbian.org/neural_signal/)**
+
 ## Research Question
 
 Can we classify whether an animal is interacting socially vs. exploring alone based on the spectral features of its neural calcium signals?
