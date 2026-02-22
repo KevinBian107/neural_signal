@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Decoding Social Intent from Neural Oscillations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============================================================
+     Section 1: Hero
+     ============================================================ -->
+<section class="hero">
+  <div>
+    <h1>Decoding Social Intent<br>from Neural Oscillations</h1>
+    <p class="subtitle">Spectral analysis of calcium imaging reveals a theta-enriched neuron subpopulation that encodes social behavior</p>
+    <p class="authors">
+      <span>Kaiwen Bian</span> &middot;
+      <span>Ketan Mittal</span> &middot;
+      <span>Ani A</span> &middot;
+      <span>Yixuan Xin</span>
+    </p>
+    <p class="institution">UC San Diego &middot; COGS 118C Signal Processing</p>
+  </div>
+  <div class="scroll-indicator" aria-hidden="true">&#8595;</div>
+</section>
+
+<!-- ============================================================
+     Section 2: Abstract
+     ============================================================ -->
+<section class="abstract">
+  <div class="container reveal">
+    <p class="section-label">Abstract</p>
+    <p class="abstract-text">
+      Social behavior requires coordinated neural activity, yet whether spectral signatures of individual neurons can predict social state remains unclear. We analyzed calcium imaging recordings from mouse prefrontal cortex across 18 sessions, extracting frequency-band power features from 3,938 neurons. While theta-band (4&ndash;7 Hz) power increases during social interaction at the population level (Cohen's d&nbsp;=&nbsp;0.235, p&nbsp;&lt;&nbsp;0.001), classification using all neurons fails a permutation test. Spectral clustering reveals two subpopulations: a majority (70%) dominated by infraslow oscillations, and a minority (30%) enriched in delta and theta power. Only this minority subpopulation significantly classifies social vs.&nbsp;solo behavior (AUC&nbsp;=&nbsp;0.570, permutation p&nbsp;=&nbsp;0.020), using theta/delta ratio&mdash;not raw power&mdash;as its top feature. These results suggest that social coding is concentrated in a spectrally distinct neuronal minority.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     Section 3: Introduction
+     ============================================================ -->
+<section>
+  <div class="container reveal">
+    <p class="section-label">Introduction</p>
+    <h2>The Question</h2>
+    <p>
+      How does the brain distinguish between being with others and being alone? Electrophysiology studies have shown that theta-band (4&ndash;7&nbsp;Hz) oscillations in the prefrontal cortex increase during social interaction in mice (<a href="https://elifesciences.org/articles/82015">Tzilivaki et&nbsp;al. 2022</a>). But these findings come from local field potentials&mdash;a macroscopic signal. We asked whether the same spectral signatures are recoverable at the level of individual neurons, using calcium imaging.
+    </p>
+    <p>
+      Calcium imaging provides single-cell resolution but acts as a low-pass filter on neural activity: the fluorescent indicator GCaMP6s has a ~600&nbsp;ms decay time, limiting resolvable frequencies to below ~7&nbsp;Hz. This makes theta the upper edge of what we can detect&mdash;exactly the band implicated in social coding.
+    </p>
+    <p>
+      We develop a signal processing pipeline that extracts spectral features from individual neurons, clusters neurons by their frequency profiles, and tests whether spectral subpopulations differ in their ability to classify behavior. Our analysis follows three questions, each building on the last.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     Section 4: From Video to Behavior Labels
+     ============================================================ -->
+<section>
+  <div class="container reveal">
+    <p class="section-label">The Experiment</p>
+    <h2>From Video to Behavior Labels</h2>
+    <p>
+      A resident mouse is recorded alone in an arena, then joined by an intruder. Video is captured at 25&nbsp;fps and processed through <strong>SLEAP</strong>, a deep-learning pose tracker that identifies 15 body keypoints on each animal. We define "social" as frames where the resident's nose is within 10&nbsp;pixels of the intruder's nearest body part.
+    </p>
+  </div>
+
+  <div class="figure-wide reveal">
+    <div class="figure">
+      <img src="figures/fig-video-frames.png" alt="Raw video frames showing a single mouse (solo) and two mice together (social)">
+      <p class="figure-caption"><strong>Figure A.</strong> Raw behavioral video frames. Left: the resident mouse explores alone. Right: the intruder has entered the arena, initiating the social period. Video recorded at 25 fps, 300 &times; 504 pixels.</p>
+    </div>
+  </div>
+
+  <div class="figure-wide reveal">
+    <div class="figure">
+      <img src="figures/fig-sleap-skeleton.png" alt="SLEAP skeleton overlays on video frames showing tracked keypoints">
+      <p class="figure-caption"><strong>Figure B.</strong> SLEAP pose estimation overlays. Each animal's 15 keypoints are connected into a skeleton. Left: animals far apart (not social). Right: animals in close proximity (social). Different colors distinguish resident from intruder.</p>
+    </div>
+  </div>
+
+  <div class="figure-wide reveal">
+    <div class="figure">
+      <img src="figures/fig-distance-threshold.png" alt="Distance timeseries with threshold line and resulting binary social label">
+      <p class="figure-caption"><strong>Figure C.</strong> Social label derivation. Top: nose-to-nearest-body distance over the full recording. The horizontal line marks the 10-pixel threshold. Bottom: binary social label derived by thresholding. The vertical dashed line indicates intruder entry.</p>
+    </div>
+  </div>
+
+  <div class="figure-wide reveal">
+    <div class="figure">
+      <img src="figures/fig-social-comparison.png" alt="Side-by-side comparison of NOT SOCIAL vs SOCIAL frames with distance annotations">
+      <p class="figure-caption"><strong>Figure D.</strong> What "social" means in practice. Left: animals separated (distance &gt; 80 px, blue border). Right: nose-to-body contact (distance &lt; 10 px, red border). The dashed white line shows the measured distance between resident nose and intruder body.</p>
+    </div>
+  </div>
+
+  <div class="container reveal">
+    <p>
+      These binary labels are resampled from 25&nbsp;fps to 30&nbsp;fps to match the calcium imaging frame rate, giving us a behavior timeseries aligned with every neural data point.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     Section 5: The Neural Recording
+     ============================================================ -->
+<section>
+  <div class="container reveal">
+    <p class="section-label">The Data</p>
+    <h2>The Neural Recording</h2>
+    <p>
+      While the mouse behaves, a miniature microscope images calcium fluorescence through a GRIN lens implanted in the prefrontal cortex. Neurons that fire produce transient increases in fluorescence (&Delta;F/F), giving us a continuous signal for each cell at 30&nbsp;fps.
+    </p>
+  </div>
+
+  <div class="figure-wide reveal">
+    <div class="figure">
+      <img src="figures/fig-correlation-image.png" alt="Correlation image showing the circular field of view with neuronal structures">
+      <p class="figure-caption"><strong>Figure E.</strong> Correlation image (C<sub>n</sub>) of the imaging field of view. Brighter regions indicate spatially correlated activity, corresponding to neuronal cell bodies. The circular boundary reflects the GRIN lens aperture.</p>
+    </div>
+  </div>
+
+  <div class="figure-wide reveal">
+    <div class="figure">
+      <img src="figures/fig-neuron-traces.png" alt="Calcium traces of top active neurons with social epoch shading">
+      <p class="figure-caption"><strong>Figure F.</strong> Raw calcium traces from the most active neurons in one session. Red-shaded regions indicate social epochs. Each row is a different neuron; the y-axis shows z-scored fluorescence (&Delta;F/F).</p>
+    </div>
+  </div>
+
+  <div class="container reveal">
+    <div class="stat-row">
+      <div class="stat">
+        <span class="stat-value">3,938</span>
+        <span class="stat-label">Total Neurons</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">18</span>
+        <span class="stat-label">Recording Sessions</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">~87 min</span>
+        <span class="stat-label">Total Recording Time</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">30 Hz</span>
+        <span class="stat-label">Sampling Rate</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     Section 6: Neural Signal Properties
+     ============================================================ -->
+<section>
+  <div class="container reveal">
+    <p class="section-label">Signal Properties</p>
+    <h2>How Neurons Respond to Social Contact</h2>
+    <p>
+      Before asking classification questions, we characterized how individual neurons' spectral content relates to behavior. Using Butterworth bandpass filters, we decomposed each neuron's calcium trace into four frequency bands: <strong>infraslow</strong> (0.01&ndash;0.1&nbsp;Hz), <strong>slow</strong> (0.1&ndash;1&nbsp;Hz), <strong>delta</strong> (1&ndash;4&nbsp;Hz), and <strong>theta</strong> (4&ndash;7&nbsp;Hz).
+    </p>
+  </div>
+
+  <div class="figure-wide reveal">
+    <div class="figure">
+      <img src="figures/fig-band-decomposition.png" alt="Band-filtered signal decomposition showing infraslow, slow, delta, and theta components aligned with social epochs">
+      <p class="figure-caption"><strong>Figure G.</strong> Spectral decomposition of a single neuron's calcium trace. Each row shows a different frequency band with its Hilbert envelope. Red shading marks social epochs. Note the visible modulation of delta and theta envelopes during social periods.</p>
+    </div>
+  </div>
+
+  <div class="container reveal">
+    <p>
+      To quantify each neuron's social sensitivity, we computed a <strong>Social Modulation Index</strong> (SMI): the normalized difference in mean activity between social and solo epochs. An SMI of +1 means exclusively active during social contact; &minus;1 means exclusively suppressed.
+    </p>
+  </div>
+
+  <div class="figure-wide reveal">
+    <div class="figure">
+      <img src="figures/fig-smi-modulation.png" alt="Social Modulation Index distribution and heatmaps of top excited and suppressed neurons">
+      <p class="figure-caption"><strong>Figure H.</strong> Social modulation across the neural population. Left: distribution of SMI values &mdash; 87% of neurons show significant modulation (|SMI| &gt; threshold), but responses are heterogeneous. Right: heatmaps of the most socially excited (top) and suppressed (bottom) neurons, aligned to social bout onset.</p>
+    </div>
+  </div>
+
+  <div class="container reveal">
+    <div class="finding">
+      <strong>Key insight:</strong> Most neurons respond to social state, but in opposite directions &mdash; some increase activity, others decrease. This heterogeneity means a simple population average would cancel out the signal.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     Section 6b: Research Questions
+     ============================================================ -->
+<section>
+  <div class="container reveal">
+    <p class="section-label">Research Questions</p>
+    <h2>Three Questions</h2>
+    <p>The heterogeneous response pattern motivates a three-part investigation, each building on the last:</p>
+    <ol class="questions-list">
+      <li><strong>Band&ndash;Behavior Link</strong> &mdash; Do specific frequency bands of the calcium signal differentiate social from solo epochs?</li>
+      <li><strong>Neuron&ndash;Band Heterogeneity</strong> &mdash; Do neurons split into subpopulations with distinct spectral profiles?</li>
+      <li><strong>Subpopulation Classification</strong> &mdash; Does a spectrally defined subpopulation drive behavior classification?</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================
+     Section 7: Q1 — Band Power and Behavior
+     ============================================================ -->
+<section>
+  <div class="container reveal">
+    <p class="section-label">Frequency Analysis</p>
+    <h2>Theta Power Dominates Social Encoding</h2>
+    <p>
+      We computed Welch PSD estimates for every neuron in every 1-second epoch, then compared band power between social and solo windows. Effect sizes (Cohen's d) quantify how much each band's power differs between conditions.
+    </p>
+  </div>
+
+  <div class="figure-wide reveal">
+    <div class="figure">
+      <img src="figures/fig-q1-band-power.png" alt="Bar chart comparing band power between social and solo conditions, with Cohen's d effect sizes">
+      <p class="figure-caption"><strong>Figure I.</strong> Left: mean band power (log scale) during social vs. solo epochs across all neurons and sessions. Right: Cohen's d effect sizes with 95% bootstrap confidence intervals. Theta shows the largest effect (d&nbsp;=&nbsp;0.235), followed by delta (d&nbsp;=&nbsp;0.165). All comparisons p&nbsp;&lt;&nbsp;0.001 after Bonferroni correction.</p>
+    </div>
+  </div>
+
+  <div class="container reveal">
+    <div class="finding">
+      Theta-band power is systematically higher during social interaction (d&nbsp;=&nbsp;0.235, p&nbsp;=&nbsp;6.5&times;10<sup>&minus;17</sup>), consistent across 14 of 18 sessions. This aligns with electrophysiology findings (Tzilivaki et&nbsp;al. 2022), confirming theta signatures are recoverable from calcium imaging despite its limited bandwidth.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     Section 8: Q2 — Spectral Clustering
+     ============================================================ -->
+<section>
+  <div class="container reveal">
+    <p class="section-label">Spectral Clustering</p>
+    <h2>Two Distinct Spectral Populations</h2>
+    <p>
+      Not all neurons contribute equally to the theta signal. K-means clustering (k&nbsp;=&nbsp;2) on each neuron's fractional band power spectrum &mdash; the proportion of total power in each frequency band &mdash; reveals two distinct spectral types.
+    </p>
+  </div>
+
+  <div class="figure-wide reveal">
+    <div class="figure">
+      <img src="figures/fig-q2-clusters.png" alt="Cluster centroid profiles, all-neuron spectral heatmap, and per-session cluster proportions">
+      <p class="figure-caption"><strong>Figure J.</strong> Left: cluster centroid profiles showing fractional band power. <span class="cluster-tag c0">Cluster 0</span> (70% of neurons) is dominated by infraslow/slow power. <span class="cluster-tag c1">Cluster 1</span> (30%) has 3&times; more delta and theta power. Center: all-neuron heatmap sorted by cluster. Right: cluster proportions are stable across all 18 sessions and isolation conditions.</p>
+    </div>
+  </div>
+
+  <div class="container reveal">
+    <div class="finding">
+      Neurons split into a <span class="cluster-tag c0">slow-dominated majority</span> (70%) and a <span class="cluster-tag c1">delta+theta enriched minority</span> (30%). This partition is robust across animals and isolation conditions, suggesting it reflects an intrinsic property of the neural population rather than a recording artifact.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     Section 9: Q3 — Classification
+     ============================================================ -->
+<section>
+  <div class="container reveal">
+    <p class="section-label">Classification</p>
+    <h2>Only the Minority Predicts Behavior</h2>
+    <p>
+      We trained linear classifiers (LDA, SVM, Logistic Regression) on spectral features extracted from each cluster separately, using GroupKFold cross-validation by session. Classification performance was validated against a permutation test baseline (1,000 shuffles).
+    </p>
+  </div>
+
+  <div class="figure-wide reveal">
+    <div class="figure">
+      <img src="figures/fig-q3-classification.png" alt="AUC comparison between all neurons, Cluster 0, and Cluster 1, plus feature importance rankings">
+      <p class="figure-caption"><strong>Figure K.</strong> Left: AUC scores for classifiers trained on all neurons, <span class="cluster-tag c0">Cluster 0</span> only, and <span class="cluster-tag c1">Cluster 1</span> only. Dashed lines show permutation-test chance levels. Right: top features by importance &mdash; Cluster 1 uses theta/delta ratio (spectral shape), while the full population relies on raw theta power.</p>
+    </div>
+  </div>
+
+  <div class="container reveal">
+    <div class="stat-row">
+      <div class="stat">
+        <span class="stat-value" style="color: var(--text-muted);">0.535</span>
+        <span class="stat-label">All Neurons AUC<br>(p = 0.196, n.s.)</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" style="color: var(--cluster0);">0.519</span>
+        <span class="stat-label">Cluster 0 AUC<br>(p = 0.407, n.s.)</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" style="color: var(--cluster1);">0.570</span>
+        <span class="stat-label">Cluster 1 AUC<br>(p = 0.020 *)</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      Only <span class="cluster-tag c1">Cluster 1</span> &mdash; the 30% theta-enriched minority &mdash; significantly classifies social vs. solo behavior (AUC&nbsp;=&nbsp;0.570, permutation p&nbsp;=&nbsp;0.020). Using all neurons together fails the permutation test (p&nbsp;=&nbsp;0.196), because the slow-dominated majority dilutes the signal. The discriminative strategy also differs: Cluster&nbsp;1 relies on theta/delta ratio (spectral shape), not raw theta power.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     Section 10: Spatial Organization
+     ============================================================ -->
+<section>
+  <div class="container reveal">
+    <p class="section-label">Spatial Analysis</p>
+    <h2>Where Are These Neurons?</h2>
+    <p>
+      If Cluster&nbsp;1 neurons are functionally distinct, are they also spatially grouped? We mapped each neuron's centroid position onto the correlation image and color-coded by cluster membership.
+    </p>
+  </div>
+
+  <div class="figure-wide reveal">
+    <div class="figure">
+      <img src="figures/fig-spatial-scatter.png" alt="Neuron centroids scattered on correlation image, color-coded by spectral cluster">
+      <p class="figure-caption"><strong>Figure L.</strong> Neuron centroid positions overlaid on the correlation image, colored by cluster membership. <span class="cluster-tag c0">Cluster 0</span> (blue) and <span class="cluster-tag c1">Cluster 1</span> (red) neurons are spatially intermixed throughout the field of view, with no apparent clustering by location.</p>
+    </div>
+  </div>
+
+  <div class="figure-wide reveal">
+    <div class="figure">
+      <img src="figures/fig-cluster-rasters.png" alt="Activity rasters for each cluster with social epoch overlay">
+      <p class="figure-caption"><strong>Figure M.</strong> Activity rasters separated by cluster, with social epochs shaded in red. Each row is a neuron; color intensity represents z-scored calcium activity. Cluster&nbsp;1 neurons show more visible modulation aligned with social transitions.</p>
+    </div>
+  </div>
+
+  <div class="figure-wide reveal">
+    <div class="figure">
+      <img src="figures/fig-intensity-maps.png" alt="Weighted intensity maps showing spatial distribution of delta and theta power">
+      <p class="figure-caption"><strong>Figure N.</strong> Delta and theta weighted intensity maps. Each neuron's spatial footprint is weighted by its band power. Despite Cluster&nbsp;1's stronger theta content, both clusters contribute to the spatial distribution &mdash; confirming that spectral identity is neuron-intrinsic, not location-dependent.</p>
+    </div>
+  </div>
+
+  <div class="container reveal">
+    <div class="finding">
+      <strong>Key finding:</strong> Cluster&nbsp;1 neurons are spatially <em>dispersed</em> and intermixed with Cluster&nbsp;0, not localized to a specific subregion. Their spectral identity appears to be an intrinsic cellular property rather than a consequence of spatial position within the imaging field.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     Section 11: Conclusion
+     ============================================================ -->
+<section class="conclusion">
+  <div class="container reveal">
+    <p class="section-label" style="color: rgba(255,255,255,0.4);">Conclusion</p>
+    <h2>A Spectral Minority Encodes Social State</h2>
+    <p>
+      Our three-question analysis reveals a consistent narrative: theta-band power increases during social interaction, but this signal is not uniformly distributed across neurons. A minority subpopulation (30%) with enriched delta and theta power is both necessary and sufficient for above-chance behavioral classification, while the slow-dominated majority contributes noise that degrades performance.
+    </p>
+    <p>
+      This result carries a methodological implication: population-level analyses that average across all neurons may miss signals concentrated in spectrally defined subpopulations. The standard approach of computing mean population PSD would have led us to conclude that classification fails &mdash; only by first identifying the relevant subpopulation did the signal emerge.
+    </p>
+
+    <h3 style="margin-top: 2em; color: rgba(255,255,255,0.7);">Limitations</h3>
+    <p>
+      Calcium imaging imposes a hard bandwidth limit &mdash; we cannot resolve gamma oscillations (&gt;30&nbsp;Hz) that electrophysiology studies implicate in social coding. Our recordings span a single cortical region (prefrontal cortex) imaged through a GRIN lens, capturing a 2D projection of a 3D structure. The modest classification AUC (0.570) reflects both genuine biological noise and the inherent limitations of calcium imaging as a proxy for neural activity.
+    </p>
+
+    <h3 style="margin-top: 2em; color: rgba(255,255,255,0.7);">Future Directions</h3>
+    <p>
+      Simultaneous electrophysiology and calcium imaging could test whether Cluster&nbsp;1 neurons correspond to a known electrophysiological cell type. Multi-region imaging (e.g., prefrontal + amygdala) could reveal whether the theta-enriched subpopulation participates in inter-area synchrony during social behavior. Finally, causal experiments &mdash; optogenetic silencing of spectrally identified neurons &mdash; would test whether the subpopulation is necessary for social behavior, not just predictive of it.
+    </p>
+
+    <h3 style="margin-top: 2em; color: rgba(255,255,255,0.7);">References</h3>
+    <ol class="references" style="padding-left: 1.2em;">
+      <li>Tzilivaki A, Tukker JJ, Maier N, et al. (2022). Prefrontal-amygdalar oscillations related to social behavior in mice. <em>eLife</em>, 11, e82015.</li>
+      <li>Bhatt DH, et al. (2013). Dendritic spine dynamics. <em>Frontiers in Neural Circuits</em>, 7, 138.</li>
+      <li>Cohen MX (2019). A better way to define and describe Morlet wavelets for time-frequency analysis. <em>NeuroImage</em>, 199, 81&ndash;86.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================
+     Footer
+     ============================================================ -->
+<footer>
+  <p>COGS 118C &middot; UC San Diego &middot; Winter 2026</p>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

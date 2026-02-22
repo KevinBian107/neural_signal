@@ -1,0 +1,411 @@
+/* ============================================================
+   Decoding Social Intent from Neural Oscillations — Site Styles
+   Distill.pub-inspired single-page scrolling layout
+   ============================================================ */
+
+/* --- Reset & Base --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --text: #1a1a2e;
+  --text-light: #555;
+  --text-muted: #888;
+  --bg: #fff;
+  --bg-alt: #f8f9fa;
+  --accent: #3498db;
+  --cluster0: #3498db;
+  --cluster1: #e74c3c;
+  --social-red: rgba(231, 76, 60, 0.12);
+  --hero-bg: #0f0f23;
+  --hero-accent: #6c63ff;
+  --border: #e0e0e0;
+  --max-text: 720px;
+  --max-figure: 1000px;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 18px;
+}
+
+body {
+  font-family: 'Source Serif 4', 'Georgia', serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Typography --- */
+h1, h2, h3, h4 {
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5em;
+  color: var(--text);
+}
+
+h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.4em;
+  color: var(--text);
+}
+
+p {
+  margin-bottom: 1em;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+a:hover {
+  border-bottom-color: var(--accent);
+}
+
+strong { font-weight: 700; }
+
+/* --- Layout --- */
+.container {
+  max-width: var(--max-text);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+section {
+  padding: 4rem 0;
+}
+
+section:nth-child(even) {
+  background: var(--bg-alt);
+}
+
+/* --- Hero --- */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--hero-bg);
+  color: #fff;
+  position: relative;
+  padding: 2rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.6em;
+  line-height: 1.15;
+}
+
+.hero .subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(0.9rem, 2vw, 1.15rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 640px;
+  margin: 0 auto 2rem;
+  line-height: 1.6;
+}
+
+.hero .authors {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.04em;
+}
+
+.hero .authors span {
+  margin: 0 0.3em;
+}
+
+.hero .institution {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin-top: 0.6em;
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: bounce 2s infinite;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1.5rem;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
+}
+
+/* --- Section Labels --- */
+.section-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 0.5em;
+}
+
+/* --- Abstract --- */
+.abstract {
+  background: var(--bg-alt);
+}
+
+.abstract-text {
+  font-size: 1.05rem;
+  color: var(--text-light);
+  border-left: 3px solid var(--accent);
+  padding-left: 1.2em;
+  font-style: italic;
+}
+
+/* --- Figures --- */
+.figure {
+  margin: 2.5rem auto;
+  text-align: center;
+}
+
+.figure-wide {
+  max-width: var(--max-text);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1.5rem;
+}
+
+.figure img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.figure-caption {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.8em;
+  line-height: 1.55;
+  max-width: var(--max-text);
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+}
+
+.figure-caption strong {
+  color: var(--text-light);
+}
+
+/* Figure placeholder (before images are added) */
+.figure-placeholder {
+  background: var(--bg-alt);
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 3rem 2rem;
+  color: var(--text-muted);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+}
+
+/* --- Key Finding Callouts --- */
+.finding {
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.06), rgba(231, 76, 60, 0.04));
+  border-left: 4px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  padding: 1.2em 1.5em;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+
+.finding strong {
+  color: var(--accent);
+}
+
+/* --- Stat Highlight --- */
+.stat-row {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.stat {
+  flex: 1;
+  min-width: 140px;
+  text-align: center;
+  padding: 1.2em 1em;
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.stat-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  display: block;
+}
+
+.stat-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.3em;
+  display: block;
+}
+
+/* --- Cluster Color Tags --- */
+.cluster-tag {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15em 0.5em;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+.cluster-tag.c0 {
+  background: rgba(52, 152, 219, 0.15);
+  color: var(--cluster0);
+}
+
+.cluster-tag.c1 {
+  background: rgba(231, 76, 60, 0.15);
+  color: var(--cluster1);
+}
+
+/* --- Questions List --- */
+.questions-list {
+  list-style: none;
+  padding: 0;
+  counter-reset: q;
+}
+
+.questions-list li {
+  counter-increment: q;
+  padding: 1em 1.2em 1em 3.2em;
+  margin-bottom: 0.8em;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  position: relative;
+  line-height: 1.6;
+}
+
+.questions-list li::before {
+  content: counter(q);
+  position: absolute;
+  left: 1em;
+  top: 1em;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+/* --- Conclusion --- */
+.conclusion {
+  background: var(--hero-bg);
+  color: #fff;
+  padding: 5rem 0;
+}
+
+.conclusion h2 {
+  color: #fff;
+}
+
+.conclusion p {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.conclusion .finding {
+  background: rgba(255, 255, 255, 0.05);
+  border-left-color: rgba(255, 255, 255, 0.3);
+}
+
+.conclusion .finding strong {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.conclusion a {
+  color: rgba(108, 99, 255, 0.9);
+}
+
+/* --- References --- */
+.references {
+  font-size: 0.82rem;
+  color: var(--text-light);
+  line-height: 1.7;
+}
+
+.references li {
+  margin-bottom: 0.5em;
+}
+
+/* --- Scroll Reveal --- */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- Footer --- */
+footer {
+  text-align: center;
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: var(--hero-bg);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+footer a {
+  color: var(--text-muted);
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  html { font-size: 16px; }
+
+  section { padding: 3rem 0; }
+
+  .hero { min-height: 80vh; }
+
+  .figure-wide { padding: 0 1rem; }
+
+  .stat-row { flex-direction: column; gap: 0.8rem; }
+
+  .stat { min-width: 0; }
+}
+
+@media (max-width: 480px) {
+  html { font-size: 15px; }
+
+  .container { padding: 0 1rem; }
+
+  h2 { font-size: 1.5rem; }
+}
