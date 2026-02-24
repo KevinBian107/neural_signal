@@ -426,3 +426,165 @@ footer a {
 
   h2 { font-size: 1.5rem; }
 }
+
+/* --- Floating Mini-Player --- */
+.mini-player {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 380px;
+  min-width: 200px;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  background: #0d1117;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+  z-index: 9999;
+  overflow: hidden;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  cursor: default;
+}
+
+.mini-player.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+}
+
+.mini-player.dragging {
+  transition: none;
+  user-select: none;
+}
+
+.mini-player.fullscreen {
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0;
+}
+
+.mini-player-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: #161b22;
+  cursor: grab;
+  user-select: none;
+}
+
+.mini-player.dragging .mini-player-header {
+  cursor: grabbing;
+}
+
+.mini-player-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mini-player-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.mini-btn {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.45);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 0.15s, background 0.15s;
+}
+
+.mini-btn:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+}
+
+.mini-player video {
+  display: block;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  object-fit: contain;
+  background: #000;
+}
+
+.mini-player.fullscreen video {
+  width: 100%;
+  height: calc(100% - 34px);
+  object-fit: contain;
+  background: #000;
+}
+
+/* --- Resize handles: edges (6px) and corners (12px) --- */
+.resize-handle { position: absolute; z-index: 10; }
+
+.resize-n  { top: -3px; left: 12px; right: 12px; height: 6px; cursor: ns-resize; }
+.resize-s  { bottom: -3px; left: 12px; right: 12px; height: 6px; cursor: ns-resize; }
+.resize-e  { right: -3px; top: 12px; bottom: 12px; width: 6px; cursor: ew-resize; }
+.resize-w  { left: -3px; top: 12px; bottom: 12px; width: 6px; cursor: ew-resize; }
+.resize-ne { top: -3px; right: -3px; width: 12px; height: 12px; cursor: nesw-resize; }
+.resize-nw { top: -3px; left: -3px; width: 12px; height: 12px; cursor: nwse-resize; }
+.resize-se { bottom: -3px; right: -3px; width: 12px; height: 12px; cursor: nwse-resize; }
+.resize-sw { bottom: -3px; left: -3px; width: 12px; height: 12px; cursor: nesw-resize; }
+
+.mini-player.fullscreen .resize-handle { display: none; }
+
+/* --- Reopen pill button --- */
+.mini-reopen-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9998;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #161b22;
+  color: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+  transition: opacity 0.3s ease, transform 0.3s ease, color 0.15s, border-color 0.15s;
+}
+
+.mini-reopen-btn:hover {
+  color: #fff;
+  border-color: rgba(255,255,255,0.35);
+}
+
+.mini-reopen-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+}
+
+@media (max-width: 480px) {
+  .mini-player {
+    width: 260px;
+    bottom: 10px;
+    right: 10px;
+  }
+  .mini-reopen-btn {
+    bottom: 10px;
+    right: 10px;
+  }
+}

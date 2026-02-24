@@ -111,29 +111,15 @@
 
   <div class="figure-wide reveal">
     <div class="figure">
-      <img src="figures/fig-video-frames.png" alt="Raw video frames showing a single mouse (solo) and two mice together (social)">
-      <p class="figure-caption"><strong>Figure A.</strong> Raw behavioral video frames. Left: the resident mouse explores alone. Right: the intruder has entered the arena, initiating the social period. Video recorded at 25 fps, 300 &times; 504 pixels.</p>
-    </div>
-  </div>
-
-  <div class="figure-wide reveal">
-    <div class="figure">
-      <img src="figures/fig-sleap-skeleton.png" alt="SLEAP skeleton overlays on video frames showing tracked keypoints">
-      <p class="figure-caption"><strong>Figure B.</strong> SLEAP pose estimation overlays. Each animal's 15 keypoints are connected into a skeleton. Left: animals far apart (not social). Right: animals in close proximity (social). Different colors distinguish resident from intruder.</p>
-    </div>
-  </div>
-
-  <div class="figure-wide reveal">
-    <div class="figure">
-      <img src="figures/fig-distance-threshold.png" alt="Distance timeseries with threshold line and resulting binary social label">
-      <p class="figure-caption"><strong>Figure C.</strong> Social label derivation. Top: nose-to-nearest-body distance over the full recording. The horizontal line marks the 10-pixel threshold. Bottom: binary social label derived by thresholding. The vertical dashed line indicates intruder entry.</p>
+      <video src="distance_bands.mp4" autoplay loop muted playsinline style="width:100%; border-radius:4px; box-shadow:0 2px 12px rgba(0,0,0,0.08);"></video>
+      <p class="figure-caption"><strong>Figure 1.</strong> SLEAP pose tracking and social proximity analysis. <strong>(A)</strong> Behavior video with skeleton overlays (green = resident, orange = intruder). <strong>(B)</strong> Nose-to-body distance with 10-pixel social threshold; the red bar indicates social contact periods. 30-second clip from Session 5 (Animal 5-2, 24hr isolation).</p>
     </div>
   </div>
 
   <div class="figure-wide reveal">
     <div class="figure">
       <img src="figures/fig-social-comparison.png" alt="Side-by-side comparison of NOT SOCIAL vs SOCIAL frames with distance annotations">
-      <p class="figure-caption"><strong>Figure D.</strong> What "social" means in practice. Left: animals separated (distance &gt; 80 px, blue border). Right: nose-to-body contact (distance &lt; 10 px, red border). The dashed white line shows the measured distance between resident nose and intruder body.</p>
+      <p class="figure-caption"><strong>Figure 2.</strong> What "social" means in practice. Left: animals separated (distance &gt; 80 px, blue border). Right: nose-to-body contact (distance &lt; 10 px, red border). The dashed white line shows the measured distance between resident nose and intruder body.</p>
     </div>
   </div>
 
@@ -159,14 +145,14 @@
   <div class="figure-wide reveal">
     <div class="figure">
       <img src="figures/fig-correlation-image.png" alt="Correlation image showing the circular field of view with neuronal structures">
-      <p class="figure-caption"><strong>Figure E.</strong> Correlation image (C<sub>n</sub>) of the imaging field of view. Brighter regions indicate spatially correlated activity, corresponding to neuronal cell bodies. The circular boundary reflects the GRIN lens aperture.</p>
+      <p class="figure-caption"><strong>Figure 3.</strong> Correlation image (C<sub>n</sub>) of the imaging field of view. Brighter regions indicate spatially correlated activity, corresponding to neuronal cell bodies. The circular boundary reflects the GRIN lens aperture.</p>
     </div>
   </div>
 
   <div class="figure-wide reveal">
     <div class="figure">
       <img src="figures/fig-neuron-traces.png" alt="Calcium traces of top active neurons with social epoch shading">
-      <p class="figure-caption"><strong>Figure F.</strong> Raw calcium traces from the most active neurons in one session. Red-shaded regions indicate social epochs. Each row is a different neuron; the y-axis shows z-scored fluorescence (&Delta;F/F).</p>
+      <p class="figure-caption"><strong>Figure 4.</strong> Raw calcium traces from the most active neurons in one session. Red-shaded regions indicate social epochs. Each row is a different neuron; the y-axis shows z-scored fluorescence (&Delta;F/F).</p>
     </div>
   </div>
 
@@ -207,7 +193,7 @@
   <div class="figure-wide reveal">
     <div class="figure">
       <img src="figures/fig-band-decomposition.png" alt="Band-filtered signal decomposition showing infraslow, slow, delta, and theta components aligned with social epochs">
-      <p class="figure-caption"><strong>Figure G.</strong> Spectral decomposition of a single neuron's calcium trace. Each row shows a different frequency band with its Hilbert envelope. Red shading marks social epochs. Note the visible modulation of delta and theta envelopes during social periods.</p>
+      <p class="figure-caption"><strong>Figure 5.</strong> Spectral decomposition of a single neuron's calcium trace. Each row shows a different frequency band with its Hilbert envelope. Red shading marks social epochs. Note the visible modulation of delta and theta envelopes during social periods.</p>
     </div>
   </div>
 
@@ -220,7 +206,7 @@
   <div class="figure-wide reveal">
     <div class="figure">
       <img src="figures/fig-smi-modulation.png" alt="Social Modulation Index distribution and heatmaps of top excited and suppressed neurons">
-      <p class="figure-caption"><strong>Figure H.</strong> Social modulation across the neural population. Left: distribution of SMI values &mdash; 87% of neurons show significant modulation (|SMI| &gt; threshold), but responses are heterogeneous. Right: heatmaps of the most socially excited (top) and suppressed (bottom) neurons, aligned to social bout onset.</p>
+      <p class="figure-caption"><strong>Figure 6.</strong> Social modulation across the neural population. Left: distribution of SMI values &mdash; 87% of neurons show significant modulation (|SMI| &gt; threshold), but responses are heterogeneous. Right: heatmaps of the most socially excited (top) and suppressed (bottom) neurons, aligned to social bout onset.</p>
     </div>
   </div>
 
@@ -262,7 +248,7 @@
   <div class="figure-wide reveal">
     <div class="figure">
       <img src="figures/fig-q1-band-power.png" alt="Bar chart comparing band power between social and solo conditions, with Cohen's d effect sizes">
-      <p class="figure-caption"><strong>Figure I.</strong> Left: mean band power (log scale) during social vs. solo epochs across all neurons and sessions. Right: Cohen's d effect sizes with 95% bootstrap confidence intervals. Theta shows the largest effect (d&nbsp;=&nbsp;0.235), followed by delta (d&nbsp;=&nbsp;0.165). All comparisons p&nbsp;&lt;&nbsp;0.001 after Bonferroni correction.</p>
+      <p class="figure-caption"><strong>Figure 7.</strong> Left: mean band power (log scale) during social vs. solo epochs across all neurons and sessions. Right: Cohen's d effect sizes with 95% bootstrap confidence intervals. Theta shows the largest effect (d&nbsp;=&nbsp;0.235), followed by delta (d&nbsp;=&nbsp;0.165). All comparisons p&nbsp;&lt;&nbsp;0.001 after Bonferroni correction.</p>
     </div>
   </div>
 
@@ -288,7 +274,7 @@
   <div class="figure-wide reveal">
     <div class="figure">
       <img src="figures/fig-q2-clusters.png" alt="Cluster centroid profiles, all-neuron spectral heatmap, and per-session cluster proportions">
-      <p class="figure-caption"><strong>Figure J.</strong> Left: cluster centroid profiles showing fractional band power. <span class="cluster-tag c0">Cluster 0</span> (70% of neurons) is dominated by infraslow/slow power. <span class="cluster-tag c1">Cluster 1</span> (30%) has 3&times; more delta and theta power. Center: all-neuron heatmap sorted by cluster. Right: cluster proportions are stable across all 18 sessions and isolation conditions.</p>
+      <p class="figure-caption"><strong>Figure 8.</strong> Left: cluster centroid profiles showing fractional band power. <span class="cluster-tag c0">Cluster 0</span> (70% of neurons) is dominated by infraslow/slow power. <span class="cluster-tag c1">Cluster 1</span> (30%) has 3&times; more delta and theta power. Center: all-neuron heatmap sorted by cluster. Right: cluster proportions are stable across all 18 sessions and isolation conditions.</p>
     </div>
   </div>
 
@@ -314,7 +300,7 @@
   <div class="figure-wide reveal">
     <div class="figure">
       <img src="figures/fig-q3-classification.png" alt="AUC comparison between all neurons, Cluster 0, and Cluster 1, plus feature importance rankings">
-      <p class="figure-caption"><strong>Figure K.</strong> Left: AUC scores for classifiers trained on all neurons, <span class="cluster-tag c0">Cluster 0</span> only, and <span class="cluster-tag c1">Cluster 1</span> only. Dashed lines show permutation-test chance levels. Right: top features by importance &mdash; Cluster 1 uses theta/delta ratio (spectral shape), while the full population relies on raw theta power.</p>
+      <p class="figure-caption"><strong>Figure 9.</strong> Left: AUC scores for classifiers trained on all neurons, <span class="cluster-tag c0">Cluster 0</span> only, and <span class="cluster-tag c1">Cluster 1</span> only. Dashed lines show permutation-test chance levels. Right: top features by importance &mdash; Cluster 1 uses theta/delta ratio (spectral shape), while the full population relies on raw theta power.</p>
     </div>
   </div>
 
@@ -355,21 +341,21 @@
   <div class="figure-wide reveal">
     <div class="figure">
       <img src="figures/fig-spatial-scatter.png" alt="Neuron centroids scattered on correlation image, color-coded by spectral cluster">
-      <p class="figure-caption"><strong>Figure L.</strong> Neuron centroid positions overlaid on the correlation image, colored by cluster membership. <span class="cluster-tag c0">Cluster 0</span> (blue) and <span class="cluster-tag c1">Cluster 1</span> (red) neurons are spatially intermixed throughout the field of view, with no apparent clustering by location.</p>
+      <p class="figure-caption"><strong>Figure 10.</strong> Neuron centroid positions overlaid on the correlation image, colored by cluster membership. <span class="cluster-tag c0">Cluster 0</span> (blue) and <span class="cluster-tag c1">Cluster 1</span> (red) neurons are spatially intermixed throughout the field of view, with no apparent clustering by location.</p>
     </div>
   </div>
 
   <div class="figure-wide reveal">
     <div class="figure">
       <img src="figures/fig-cluster-rasters.png" alt="Activity rasters for each cluster with social epoch overlay">
-      <p class="figure-caption"><strong>Figure M.</strong> Activity rasters separated by cluster, with social epochs shaded in red. Each row is a neuron; color intensity represents z-scored calcium activity. Cluster&nbsp;1 neurons show more visible modulation aligned with social transitions.</p>
+      <p class="figure-caption"><strong>Figure 11.</strong> Activity rasters separated by cluster, with social epochs shaded in red. Each row is a neuron; color intensity represents z-scored calcium activity. Cluster&nbsp;1 neurons show more visible modulation aligned with social transitions.</p>
     </div>
   </div>
 
   <div class="figure-wide reveal">
     <div class="figure">
       <img src="figures/fig-intensity-maps.png" alt="Weighted intensity maps showing spatial distribution of delta and theta power">
-      <p class="figure-caption"><strong>Figure N.</strong> Delta and theta weighted intensity maps. Each neuron's spatial footprint is weighted by its band power. Despite Cluster&nbsp;1's stronger theta content, both clusters contribute to the spatial distribution &mdash; confirming that spectral identity is neuron-intrinsic, not location-dependent.</p>
+      <p class="figure-caption"><strong>Figure 12.</strong> Delta and theta weighted intensity maps. Each neuron's spatial footprint is weighted by its band power. Despite Cluster&nbsp;1's stronger theta content, both clusters contribute to the spatial distribution &mdash; confirming that spectral identity is neuron-intrinsic, not location-dependent.</p>
     </div>
   </div>
 
@@ -426,6 +412,33 @@
 <footer>
   <p>COGS 118C &middot; UC San Diego &middot; Winter 2026</p>
 </footer>
+
+<!-- Floating mini-player for sleap_spatial video -->
+<div id="mini-player" class="mini-player hidden">
+  <div class="mini-player-header">
+    <span class="mini-player-title">Social Intent and Neuron Activation</span>
+    <div class="mini-player-controls">
+      <button class="mini-btn" id="mini-fullscreen" title="Fullscreen" aria-label="Fullscreen">&#x26F6;</button>
+      <button class="mini-btn" id="mini-minimize" title="Minimize" aria-label="Minimize">&#x2015;</button>
+    </div>
+  </div>
+  <video id="mini-video" src="sleap_spatial.mp4" loop muted playsinline></video>
+  <!-- Resize handles: edges and corners -->
+  <div class="resize-handle resize-n" data-dir="n"></div>
+  <div class="resize-handle resize-s" data-dir="s"></div>
+  <div class="resize-handle resize-e" data-dir="e"></div>
+  <div class="resize-handle resize-w" data-dir="w"></div>
+  <div class="resize-handle resize-ne" data-dir="ne"></div>
+  <div class="resize-handle resize-nw" data-dir="nw"></div>
+  <div class="resize-handle resize-se" data-dir="se"></div>
+  <div class="resize-handle resize-sw" data-dir="sw"></div>
+</div>
+
+<!-- Reopen pill for minimized mini-player -->
+<button id="mini-reopen" class="mini-reopen-btn hidden" title="Show video player" aria-label="Show video player">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+  <span>Video</span>
+</button>
 
 <script src="js/main.js"></script>
 </body>

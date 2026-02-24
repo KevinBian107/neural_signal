@@ -323,7 +323,7 @@ print("[7/8] Rendering Video 1 — SLEAP + Bands + Spatial …")
 fig1 = plt.figure(figsize=(OUTPUT_W / DPI, OUTPUT_H / DPI), dpi=DPI,
                   facecolor=BG)
 
-gs1 = GridSpec(3, 3, height_ratios=[0.8, 1, 1], width_ratios=[1, 1, 1],
+gs1 = GridSpec(3, 3, height_ratios=[1.2, 0.7, 1], width_ratios=[1, 1, 1],
                left=0.03, right=0.99, top=0.94, bottom=0.03,
                hspace=0.14, wspace=0.06, figure=fig1)
 
