@@ -129,24 +129,6 @@ c1_s5 = np.where(cmap_s5 == 1)[0]
 print(f"  Session 5 clusters: C0={len(c0_s5)}, C1={len(c1_s5)}")
 
 # ═══════════════════════════════════════════════════════════════════════════
-# Pick representative neurons from Session 5
-# ═══════════════════════════════════════════════════════════════════════════
-print("[3/9] Selecting representative neurons …")
-s5_prof = prof_df[prof_df['session_idx'] == SESSION_VID].copy()
-frac_cols = [f'{b}_frac' for b in FREQ_BANDS.keys()]
-
-# For each cluster, pick neuron closest to the cluster centroid
-rep_neurons = {}
-for cl in [0, 1]:
-    sub = s5_prof[s5_prof['cluster'] == cl]
-    centroid = sub[frac_cols].mean().values
-    dists = np.linalg.norm(sub[frac_cols].values - centroid, axis=1)
-    best_idx = sub.index[np.argmin(dists)]
-    nid = int(sub.loc[best_idx, 'neuron_id'])
-    rep_neurons[cl] = nid
-    print(f"  Cluster {cl} representative: Neuron {nid}")
-
-# ═══════════════════════════════════════════════════════════════════════════
 # Time windows
 # ═══════════════════════════════════════════════════════════════════════════
 n_cal = int(DURATION_S * IMAGING_FPS)
@@ -167,22 +149,7 @@ cal_z5_win = cal_z_s5[start_cal5:start_cal5 + n_cal]
 # ═══════════════════════════════════════════════════════════════════════════
 # Band decomposition for the two representative neurons
 # ═══════════════════════════════════════════════════════════════════════════
-print("[4/9] Computing band decompositions …")
-neuron_bands = {}
-neuron_envs  = {}
-for cl in [0, 1]:
-    nid = rep_neurons[cl]
-    sig_full = detrend(cal_s5[:, nid].astype(np.float64))
-    neuron_bands[cl] = {}
-    neuron_envs[cl]  = {}
-    for bn, (lo, hi) in FREQ_BANDS.items():
-        neuron_bands[cl][bn] = bandpass_filter(sig_full, lo, hi, IMAGING_FPS)[start_cal5:start_cal5 + n_cal]
-        neuron_envs[cl][bn]  = band_envelope(sig_full, lo, hi, IMAGING_FPS)[start_cal5:start_cal5 + n_cal]
-    # Also store raw windowed trace
-    neuron_bands[cl]['raw'] = sig_full[start_cal5:start_cal5 + n_cal]
-
-# Cluster population mean band decomposition (for Video 3)
-print("  Computing population mean band decomposition (Video 3) …")
+print("[3/9] Computing population band decompositions …")
 pop_bands = {}
 pop_envs  = {}
 for cl, neurons in [(0, c0_s5), (1, c1_s5)]:
@@ -350,17 +317,17 @@ def make_band_panel(ax, title_str, b_data, e_data, show_social=True,
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# VIDEO 1 — SLEAP + Band Decomposition + Spatial per cluster
+# VIDEO 1 — SLEAP + Band Decomposition + 3 Spatial Panels
 # ═══════════════════════════════════════════════════════════════════════════
 print("[7/8] Rendering Video 1 — SLEAP + Bands + Spatial …")
 fig1 = plt.figure(figsize=(OUTPUT_W / DPI, OUTPUT_H / DPI), dpi=DPI,
                   facecolor=BG)
 
-gs1 = GridSpec(3, 2, height_ratios=[0.8, 1, 0.8], width_ratios=[1, 1],
-               left=0.04, right=0.98, top=0.94, bottom=0.03,
-               hspace=0.14, wspace=0.08, figure=fig1)
+gs1 = GridSpec(3, 3, height_ratios=[0.8, 1, 1], width_ratios=[1, 1, 1],
+               left=0.03, right=0.99, top=0.94, bottom=0.03,
+               hspace=0.14, wspace=0.06, figure=fig1)
 
-# -- Row 0: SLEAP video (spans both columns) --
+# -- Row 0: SLEAP video (spans all 3 columns) --
 cap = cv2.VideoCapture(str(DATA_DIR / 'behavior_video.mp4'))
 cap.set(cv2.CAP_PROP_POS_FRAMES, start_beh_vid)
 _, first = cap.read()
@@ -374,9 +341,11 @@ txt1_vid = ax1_vid.text(0.02, 0.92, '', transform=ax1_vid.transAxes,
                         va='top', ha='left',
                         bbox=dict(boxstyle='round,pad=0.3', fc='black', alpha=0.65))
 
-# -- Row 1: Band decomposition per cluster (population mean) --
-ax1_b0 = fig1.add_subplot(gs1[1, 0])
-ax1_b1 = fig1.add_subplot(gs1[1, 1])
+# -- Row 1: Band decomposition per cluster (left 2 cols) + legend (right col) --
+# Band panels span columns 0-1 (left half) and 1-2 (right half) of a 2-col sub
+band_gs = GridSpecFromSubplotSpec(1, 2, gs1[1, :3], wspace=0.08)
+ax1_b0 = fig1.add_subplot(band_gs[0])
+ax1_b1 = fig1.add_subplot(band_gs[1])
 cur1_b0, mask1_b0 = make_band_panel(
     ax1_b0,
     f'Cluster 0 — Low-Frequency  (n={len(c0_s5)} neurons)',
@@ -386,26 +355,28 @@ cur1_b1, mask1_b1 = make_band_panel(
     f'Cluster 1 — High-Frequency  (n={len(c1_s5)} neurons)',
     pop_bands[1], pop_envs[1], show_social=True, title_size=12)
 
-# -- Row 2: Spatial activation per cluster --
-ax1_s0 = fig1.add_subplot(gs1[2, 0])
-ax1_s0.set_facecolor('black')
-ax1_s0.imshow(Cn_n, cmap='gray', alpha=0.6)
-im1_c0 = ax1_s0.imshow(np.zeros((*ms, 4)))
-ax1_s0.set_xticks([]); ax1_s0.set_yticks([])
-for sp in ax1_s0.spines.values():
-    sp.set_color(SPINE_C)
-ax1_s0.set_title(f'Cluster 0 — Low-Freq Spatial  (n={len(c0_s5)})',
-                 fontsize=12, fontweight='bold', color=TEXT_C, pad=3)
+# -- Row 2: 3 spatial panels — C0 | C1 | Combined --
+def setup_spatial_panel(ax, title):
+    ax.set_facecolor('black')
+    ax.imshow(Cn_n, cmap='gray', alpha=0.6)
+    im = ax.imshow(np.zeros((*ms, 4)))
+    ax.set_xticks([]); ax.set_yticks([])
+    for s in ax.spines.values():
+        s.set_color(SPINE_C)
+    ax.set_title(title, fontsize=11, fontweight='bold', color=TEXT_C, pad=3)
+    return im
 
-ax1_s1 = fig1.add_subplot(gs1[2, 1])
-ax1_s1.set_facecolor('black')
-ax1_s1.imshow(Cn_n, cmap='gray', alpha=0.6)
-im1_c1 = ax1_s1.imshow(np.zeros((*ms, 4)))
-ax1_s1.set_xticks([]); ax1_s1.set_yticks([])
-for sp in ax1_s1.spines.values():
-    sp.set_color(SPINE_C)
-ax1_s1.set_title(f'Cluster 1 — High-Freq Spatial  (n={len(c1_s5)})',
-                 fontsize=12, fontweight='bold', color=TEXT_C, pad=3)
+ax1_s0 = fig1.add_subplot(gs1[2, 0])
+im1_c0 = setup_spatial_panel(ax1_s0,
+    f'Cluster 0 — Low-Freq (n={len(c0_s5)})')
+
+ax1_sc = fig1.add_subplot(gs1[2, 1])
+im1_cb = setup_spatial_panel(ax1_sc,
+    'Combined (Blue=C0, Red=C1)')
+
+ax1_s1 = fig1.add_subplot(gs1[2, 2])
+im1_c1 = setup_spatial_panel(ax1_s1,
+    f'Cluster 1 — High-Freq (n={len(c1_s5)})')
 
 fig1.suptitle('Neural Activity During Social Interaction',
               fontsize=16, color=TEXT_C, fontweight='bold', y=0.99)
@@ -442,18 +413,29 @@ for fi in range(N_FRAMES):
     cur1_b0.set_xdata([t, t])
     cur1_b1.set_xdata([t, t])
 
-    # Spatial maps — separate per cluster
+    # Spatial maps
     m0, m1 = spatial_maps(cal_idx)
+    a0 = np.clip(m0 / (vmax0 + 1e-12), 0, 1)
+    a1 = np.clip(m1 / (vmax1 + 1e-12), 0, 1)
 
+    # Panel 1: Cluster 0 only (blue)
     rgba0 = np.zeros((*ms, 4))
     rgba0[..., 2] = 1.0
-    rgba0[..., 3] = np.clip(m0 / (vmax0 + 1e-12), 0, 1) * 0.6
+    rgba0[..., 3] = a0 * 0.7
     im1_c0.set_data(rgba0)
 
+    # Panel 2: Cluster 1 only (red)
     rgba1 = np.zeros((*ms, 4))
     rgba1[..., 0] = 1.0
-    rgba1[..., 3] = np.clip(m1 / (vmax1 + 1e-12), 0, 1) * 0.75
+    rgba1[..., 3] = a1 * 0.8
     im1_c1.set_data(rgba1)
+
+    # Panel 3: Combined overlay
+    rgba_cb = np.zeros((*ms, 4))
+    rgba_cb[..., 2] = a0          # blue
+    rgba_cb[..., 0] = a1          # red
+    rgba_cb[..., 3] = np.clip(a0 * 0.7 + a1 * 0.8, 0, 1)
+    im1_cb.set_data(rgba_cb)
 
     fig1.canvas.draw()
     buf = np.asarray(fig1.canvas.buffer_rgba())[:, :, :3]
@@ -473,17 +455,17 @@ print(f"  Video 1 → {os.path.abspath(out1)}")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# VIDEO 2 — SLEAP + Distance + Band Decomposition (2 neurons)
+# VIDEO 2 — SLEAP + Distance
 # ═══════════════════════════════════════════════════════════════════════════
-print("[8/8] Rendering Video 2 — SLEAP + Distance + Bands …")
+print("[8/8] Rendering Video 2 — SLEAP + Distance …")
 fig2 = plt.figure(figsize=(OUTPUT_W / DPI, OUTPUT_H / DPI), dpi=DPI,
                   facecolor=BG)
 
-gs2 = GridSpec(2, 2, width_ratios=[1, 1], height_ratios=[1, 1.1],
-               left=0.05, right=0.98, top=0.93, bottom=0.05,
-               wspace=0.10, hspace=0.18, figure=fig2)
+gs2 = GridSpec(1, 2, width_ratios=[1, 1],
+               left=0.05, right=0.98, top=0.93, bottom=0.08,
+               wspace=0.10, figure=fig2)
 
-# -- top-left: SLEAP video --
+# -- left: SLEAP video --
 cap2 = cv2.VideoCapture(str(DATA_DIR / 'behavior_video.mp4'))
 cap2.set(cv2.CAP_PROP_POS_FRAMES, start_beh_vid)
 _, first2 = cap2.read()
@@ -497,7 +479,7 @@ txt2_vid = ax2_vid.text(0.02, 0.96, '', transform=ax2_vid.transAxes,
                         va='top', ha='left',
                         bbox=dict(boxstyle='round,pad=0.3', fc='black', alpha=0.65))
 
-# -- top-right: distance + social bar --
+# -- right: distance + social bar --
 from matplotlib.patches import Rectangle
 
 dist_gs = GridSpecFromSubplotSpec(2, 1, gs2[0, 1],
@@ -543,21 +525,7 @@ mask_sbar = Rectangle((0, -0.05), DURATION_S, 1.2,
 ax2_sbar.add_patch(mask_sbar)
 cur_sbar = ax2_sbar.axvline(0, color='#f0f6fc', lw=2, alpha=0.9, zorder=5)
 
-
-# -- bottom panels: band decomposition for 2 neurons --
-iso_label = entrances.iloc[SESSION_VID]['Isolation Length']
-ax2_b0 = fig2.add_subplot(gs2[1, 0])
-ax2_b1 = fig2.add_subplot(gs2[1, 1])
-cur_b0, mask_b0 = make_band_panel(
-    ax2_b0,
-    f'Cluster 0 (Low-Freq) — Animal {animal_s5}, Neuron #{rep_neurons[0]}  ({iso_label})',
-    neuron_bands[0], neuron_envs[0])
-cur_b1, mask_b1 = make_band_panel(
-    ax2_b1,
-    f'Cluster 1 (High-Freq) — Animal {animal_s5}, Neuron #{rep_neurons[1]}  ({iso_label})',
-    neuron_bands[1], neuron_envs[1])
-
-fig2.suptitle('Spectral Decomposition of Individual Neurons',
+fig2.suptitle('Social Proximity During Interaction',
               fontsize=17, color=TEXT_C, fontweight='bold', y=0.99)
 
 skel_art2 = []
@@ -588,16 +556,10 @@ for fi in range(N_FRAMES):
     mask_dist.set_width(remaining)
     mask_sbar.set_x(t)
     mask_sbar.set_width(remaining)
-    mask_b0.set_x(t)
-    mask_b0.set_width(remaining)
-    mask_b1.set_x(t)
-    mask_b1.set_width(remaining)
 
     # Cursors at leading edge
     cur_dist.set_xdata([t, t])
     cur_sbar.set_xdata([t, t])
-    cur_b0.set_xdata([t, t])
-    cur_b1.set_xdata([t, t])
 
     fig2.canvas.draw()
     buf = np.asarray(fig2.canvas.buffer_rgba())[:, :, :3]
