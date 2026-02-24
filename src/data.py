@@ -15,7 +15,6 @@ FILES = {
     'calcium.00.h5':                 '1UthpsskvkHbKKDsbQjUxyVN4Xkd-ZJuN',
     'social_bouts.00.h5':            '1Mh8oGKNyKpT5WS0Wu92SULFFanvqmSMf',
     'SI3_2022_Entrance_Frames.xlsx': '1POpRqpA_QaWfZhxswQvLSs9uBnnHrmhZ',
-    'spatial_footprints.00.h5':      '1PYLeqT88IH_9JWNPwYaUC9WJVT2IqevL',
     'behavior_video.mp4':            '1SAfse1kJU4AGk8AFxbt34GsElpUxCFMj',
     'behavior_tracking.slp':         '1ROllUZbwevCP3oAjSNwbxq-zVotzzxJ4',
 }
@@ -143,12 +142,12 @@ def align_all_sessions(imaging, behavior, entrances,
 
 
 def load_spatial_footprints(data_dir=None):
-    """Load spatial footprints (A) and correlation image (Cn) for Session 0.
+    """Load spatial footprints (A) and correlation image (Cn) for Session 5.
 
     Returns dict with keys: A (n_neurons, 600, 600), Cn (600, 600), Fs.
     """
     data_dir = Path(data_dir) if data_dir else DATA_DIR
-    path = data_dir / 'spatial_footprints.00.h5'
+    path = data_dir / 'spatial_footprints_5-2.h5'
     with h5py.File(path, 'r') as f:
         A_flat = f['A'][:]        # (n_neurons, 360000)
         Cn = f['Cn'][:]           # (600, 600)
