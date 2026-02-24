@@ -88,15 +88,55 @@ section:nth-child(even) {
 
 /* --- Hero --- */
 .hero {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  background: var(--hero-bg);
+  background: #000;
   color: #fff;
   position: relative;
   padding: 2rem;
+  overflow: hidden;
+}
+
+/* --- Hero Video Grid (4×3 background) --- */
+.hero-video-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  /* behavior is ~1.68:1 aspect, spatial clips are 1:1 */
+  grid-template-columns: 1.68fr 1fr 1fr 1fr;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 1px;
+  z-index: 0;
+}
+
+.hero-video-grid video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* --- Hero Dark Overlay --- */
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 15, 35, 0.68);
+  z-index: 1;
+}
+
+/* --- Hero Text Content --- */
+.hero-content {
+  position: relative;
+  z-index: 2;
 }
 
 .hero h1 {
@@ -160,6 +200,7 @@ section:nth-child(even) {
   animation: bounce 2s infinite;
   color: rgba(255, 255, 255, 0.3);
   font-size: 1.5rem;
+  z-index: 2;
 }
 
 @keyframes bounce {
@@ -410,7 +451,9 @@ footer a {
 
   section { padding: 3rem 0; }
 
-  .hero { min-height: 80vh; }
+  .hero { min-height: 80vh; background: var(--hero-bg); }
+
+  .hero-video-grid { display: none; }
 
   .figure-wide { padding: 0 1rem; }
 
