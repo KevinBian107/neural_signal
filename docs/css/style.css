@@ -509,6 +509,7 @@ footer a {
   width: 100% !important;
   height: 100% !important;
   border-radius: 0;
+  z-index: 10001;
 }
 
 .mini-player-header {
@@ -831,6 +832,28 @@ footer a {
 
 .method-table tr:last-child td {
   border-bottom: none;
+}
+
+/* Appendix Inline SVG Figures */
+.appendix-figure {
+  margin: 1.8rem 0;
+  text-align: center;
+}
+
+.appendix-figure svg {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  background: #fafbfc;
+}
+
+.appendix-figure-caption {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.6em;
+  line-height: 1.5;
+  text-align: center;
 }
 
 /* Back to Top Button */

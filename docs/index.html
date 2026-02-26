@@ -77,57 +77,37 @@
 </section>
 
 <!-- ============================================================
-     Section 3: Introduction
+     Section 3: Introduction & Background (merged, tightened)
      ============================================================ -->
 <section>
   <div class="container reveal">
     <p class="section-label">Introduction</p>
     <h2>The Question</h2>
     <p>
-      How does the brain distinguish between being with others and being alone? Electrophysiology studies have shown that theta-band (4&ndash;7&nbsp;Hz) oscillations in the prefrontal cortex increase during social interaction in mice (<a href="https://elifesciences.org/articles/78428">Kuga et&nbsp;al. 2022</a>). But these findings come from local field potentials&mdash;a macroscopic signal. We asked whether the same spectral signatures are recoverable at the level of individual neurons, using calcium imaging.
+      Theta-band (4&ndash;7&nbsp;Hz) oscillations in the prefrontal cortex track social behavior in mice. <a href="https://elifesciences.org/articles/78428">Kuga et&nbsp;al. (2022)</a> showed this with electrophysiology and confirmed it causally via optogenetics, while <a href="https://www.nature.com/articles/s41380-024-02754-8">Mohapatra et&nbsp;al. (2025)</a> demonstrated that excess theta synchrony impairs social discrimination. But these findings come from local field potentials&mdash;a macroscopic signal. We asked: <em>can the same theta signatures be recovered from individual neurons using calcium imaging?</em>
     </p>
     <p>
-      Calcium imaging provides single-cell resolution but acts as a low-pass filter on neural activity: the fluorescent indicator GCaMP6s has a ~600&nbsp;ms decay time, limiting resolvable frequencies to below ~7&nbsp;Hz. This makes theta the upper edge of what we can detect&mdash;exactly the band implicated in social coding.
+      Calcium imaging studies of social behavior in mPFC have revealed rich single-cell coding (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6224317/">Liang et&nbsp;al. 2018</a>; <a href="https://www.sciencedirect.com/science/article/pii/S0092867419305501">Kingsbury et&nbsp;al. 2019</a>; <a href="https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001235">Frost, Haggart &amp; Sohal 2021</a>), but <strong>every study uses rate-based or correlation-based measures</strong>&mdash;none have examined frequency content. The technical challenge is real: GCaMP6s has a ~600&nbsp;ms decay time, placing theta at the very edge of what calcium imaging can resolve. Still, spectral analysis of calcium traces has been validated in other contexts (<a href="https://www.frontiersin.org/journals/neural-circuits/articles/10.3389/fncir.2013.00199/full">Tibau et&nbsp;al. 2013</a>; <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6033549/">Zhu et&nbsp;al. 2018</a>), just never for social behavior.
     </p>
     <p>
-      We use data from the EDGE (Educating &amp; Developing scholars in Genomics and Engineering) neuroscience course developed by Talmo Pereira and colleagues, which provides calcium fluorescence recordings paired with behavioral video and pose tracking from social interaction experiments. Using this dataset, we develop a signal processing pipeline that extracts spectral features from individual neurons, clusters neurons by their frequency profiles, and tests whether spectral subpopulations differ in their ability to classify behavior. Our analysis follows three questions, each building on the last.
+      We bridge this gap using data from the EDGE neuroscience course (Talmo Pereira and colleagues), applying spectral feature extraction&mdash;Welch PSD, band power, theta/delta ratio&mdash;to single-neuron calcium traces. Rather than asking <em>which neurons fire more</em>, we ask <em>which neurons oscillate differently</em>.
     </p>
   </div>
 </section>
 
 <!-- ============================================================
-     Section 3b: Background
+     Section 3b: Research Questions (moved up)
      ============================================================ -->
 <section>
   <div class="container reveal">
-    <p class="section-label">Background</p>
-    <h2>What We Know &mdash; and What We Don't</h2>
-
-    <h3>Theta oscillations and social behavior</h3>
-    <p>
-      The link between prefrontal theta and social behavior is now supported by multiple electrophysiology studies. <a href="https://elifesciences.org/articles/78428">Kuga et&nbsp;al. (2022)</a> showed that 4&ndash;7&nbsp;Hz power in the dorsomedial prefrontal cortex increases during social attention in mice, with optogenetic replication of these oscillatory patterns restoring social behavior in Shank3-knockout animals. <a href="https://www.nature.com/articles/s41380-024-02754-8">Mohapatra et&nbsp;al. (2024)</a> extended this by demonstrating that <em>excess</em> prefrontal theta synchrony in Cntnap2-deficient mice impairs social discrimination, establishing that theta-band activity is not merely correlated with social state but causally involved. These findings converge on a clear picture: prefrontal theta oscillations track social engagement, and disrupting them disrupts social behavior.
-    </p>
-
-    <h3>Calcium imaging of social behavior in mPFC</h3>
-    <p>
-      In parallel, calcium imaging has revealed rich social coding in the medial prefrontal cortex at single-cell resolution. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6224317/">Liang et&nbsp;al. (2018)</a> identified distinct ON and OFF neural ensembles&mdash;each comprising only 3&ndash;11% of imaged neurons&mdash;that encode social exploration in prelimbic cortex. <a href="https://www.sciencedirect.com/science/article/pii/S0092867419305501">Kingsbury et&nbsp;al. (2019)</a> found inter-brain correlated activity in dorsomedial PFC that predicts social interactions and dominance. <a href="https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001235">Frost, Haggart &amp; Sohal (2021)</a> showed that correlated activity in mPFC subpopulations&mdash;not individual firing rates&mdash;carries social information, with ~20&ndash;30% of neurons providing optimal decoding accuracy.
-    </p>
-
-    <h3>The gap: all rate-based, none spectral</h3>
-    <p>
-      A striking pattern emerges from this literature: <strong>every calcium imaging study of social behavior uses rate-based or correlation-based measures</strong>. Neurons are classified as "social-responsive" by whether their activity rates increase or decrease, not by their frequency content. Meanwhile, the electrophysiology studies that implicate theta oscillations operate at the population level (LFP), with no single-neuron spectral characterization.
-    </p>
-    <p>
-      This leaves a fundamental question unanswered: <em>can theta-band spectral signatures&mdash;the dominant marker of social coding in LFP&mdash;be recovered from individual neurons using calcium imaging?</em> The technical challenge is real. Calcium indicators are low-pass filters on neural activity: GCaMP6s has a ~600&nbsp;ms decay constant, placing theta (4&ndash;7&nbsp;Hz) at the very edge of what is recoverable. Spectral analysis of calcium traces has been validated in neuronal cultures (<a href="https://www.frontiersin.org/journals/neural-circuits/articles/10.3389/fncir.2013.00199/full">Tibau et&nbsp;al. 2013</a>) and for brain-state classification (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6033549/">Zhu et&nbsp;al. 2018</a>; <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6952529/">Brier et&nbsp;al. 2019</a>), but has never been applied to social behavior.
-    </p>
-    <p>
-      A second gap compounds the first. Theta/delta power ratio&mdash;a spectral shape metric&mdash;has been a standard feature in EEG sleep staging since the 1980s (<a href="https://pubmed.ncbi.nlm.nih.gov/6522504/">van Luijtelaar &amp; Coenen, 1984</a>) and outperforms raw band power for indexing behavioral modes in hippocampal LFP (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8193833/">Schultheiss et&nbsp;al. 2020</a>). Yet this metric has never been computed from calcium imaging data.
-    </p>
-
-    <h3>Our contribution</h3>
-    <p>
-      We bridge these two literatures by applying spectral feature extraction&mdash;Welch PSD, band power, theta/delta ratio&mdash;to single-neuron calcium traces during social behavior. Rather than asking <em>which neurons fire more</em>, we ask <em>which neurons oscillate differently</em>. This spectral lens reveals structure invisible to rate-based analysis: a neuron subpopulation defined not by activity level but by frequency profile, whose social coding is masked when pooled with the majority.
-    </p>
+    <p class="section-label">Research Questions</p>
+    <h2>Three Questions</h2>
+    <p>Our analysis follows three questions, each building on the last:</p>
+    <ol class="questions-list">
+      <li><strong>Band&ndash;Behavior Link</strong> &mdash; Do specific frequency bands of the calcium signal differentiate social from solo epochs?</li>
+      <li><strong>Neuron&ndash;Band Heterogeneity</strong> &mdash; Do neurons split into subpopulations with distinct spectral profiles?</li>
+      <li><strong>Subpopulation Classification</strong> &mdash; Does a spectrally defined subpopulation drive behavior classification?</li>
+    </ol>
   </div>
 </section>
 
@@ -252,22 +232,6 @@
 </section>
 
 <!-- ============================================================
-     Section 6b: Research Questions
-     ============================================================ -->
-<section>
-  <div class="container reveal">
-    <p class="section-label">Research Questions</p>
-    <h2>Three Questions</h2>
-    <p>The heterogeneous response pattern motivates a three-part investigation, each building on the last:</p>
-    <ol class="questions-list">
-      <li><strong>Band&ndash;Behavior Link</strong> &mdash; Do specific frequency bands of the calcium signal differentiate social from solo epochs?</li>
-      <li><strong>Neuron&ndash;Band Heterogeneity</strong> &mdash; Do neurons split into subpopulations with distinct spectral profiles?</li>
-      <li><strong>Subpopulation Classification</strong> &mdash; Does a spectrally defined subpopulation drive behavior classification?</li>
-    </ol>
-  </div>
-</section>
-
-<!-- ============================================================
      Section 7: Q1 — Band Power and Behavior
      ============================================================ -->
 <section>
@@ -282,7 +246,7 @@
   <div class="figure-wide reveal">
     <div class="figure">
       <img src="figures/fig-q1-band-power.png" alt="Bar chart comparing band power between social and solo conditions, with Cohen's d effect sizes">
-      <p class="figure-caption"><strong>Figure 7.</strong> Left: mean band power (log scale) during social vs. solo epochs across all neurons and sessions. Right: Cohen's d effect sizes with 95% bootstrap confidence intervals. Theta shows the largest effect (d&nbsp;=&nbsp;0.235), followed by delta (d&nbsp;=&nbsp;0.069). All comparisons p&nbsp;&lt;&nbsp;0.001 after Bonferroni correction.</p>
+      <p class="figure-caption"><strong>Figure 7.</strong> Left: mean band power (log scale) during social vs. solo epochs across all neurons and sessions. Right: Cohen's d effect sizes with 95% bootstrap confidence intervals. Theta shows the largest effect (d&nbsp;=&nbsp;0.235), followed by delta (d&nbsp;=&nbsp;0.069). Both delta and theta pass Bonferroni correction (p&nbsp;&lt;&nbsp;0.001); infraslow and slow do not.</p>
     </div>
   </div>
 
@@ -427,14 +391,13 @@
     <h3 style="margin-top: 2em; color: rgba(255,255,255,0.7);">References</h3>
     <ol class="references" style="padding-left: 1.2em;">
       <li>Kuga N, Abe R, Takano K, Ikegaya Y, Sasaki T (2022). Prefrontal-amygdalar oscillations related to social behavior in mice. <em>eLife</em>, 11, e78428.</li>
-      <li>Liang B, Zhang L, Barbera G, et al. (2018). Distinct and dynamic ON and OFF neural ensembles in the prefrontal cortex code social exploration. <em>Neuron</em>, 100(3), 700&ndash;714.</li>
+      <li>Liang B, Zhang L, Barbera G, et al. (2018). Distinct and dynamic ON and OFF neural ensembles in the prefrontal cortex code social exploration. <em>Neuron</em>, 100(3), 700&ndash;714.e9.</li>
       <li>Frost NA, Haggart A, Sohal VS (2021). Dynamic patterns of correlated activity in the prefrontal cortex encode information about social behavior. <em>PLOS Biology</em>, 19(5), e3001235.</li>
-      <li>Kingsbury L, Huang S, Wang J, et al. (2019). Correlated neural activity and encoding of behavior across brains of socially interacting animals. <em>Cell</em>, 178(2), 429&ndash;446.</li>
-      <li>Mohapatra AN, Jabarin R, Ray N, Netser S, Wagner S (2024). Impaired emotion recognition in Cntnap2-deficient mice is associated with hyper-synchronous prefrontal cortex neuronal activity. <em>Molecular Psychiatry</em>, 30, 1440&ndash;1452.</li>
+      <li>Kingsbury L, Huang S, Wang J, et al. (2019). Correlated neural activity and encoding of behavior across brains of socially interacting animals. <em>Cell</em>, 178(2), 429&ndash;446.e16.</li>
+      <li>Mohapatra AN, Jabarin R, Ray N, Netser S, Wagner S (2025). Impaired emotion recognition in Cntnap2-deficient mice is associated with hyper-synchronous prefrontal cortex neuronal activity. <em>Molecular Psychiatry</em>, 30, 1440&ndash;1452.</li>
       <li>Tibau E, Valencia M, Soriano J (2013). Identification of neuronal network properties from the spectral analysis of calcium imaging signals in neuronal cultures. <em>Frontiers in Neural Circuits</em>, 7, 199.</li>
-      <li>Schultheiss NW, et al. (2020). Awake delta and theta-rhythmic hippocampal network modes during intermittent locomotor behaviors in the rat. <em>Behavioral Neuroscience</em>, 134(6), 529&ndash;546.</li>
-      <li>Donoghue T, Dominguez J, Voytek B (2020). Electrophysiological frequency band ratio measures conflate periodic and aperiodic neural activity. <em>eNeuro</em>, 7(6), ENEURO.0192-20.2020.</li>
-      <li>Pereira TD, et al. EDGE: Educating &amp; Developing scholars in Genomics and Engineering. Salk Institute / UC San Diego. Calcium imaging and behavioral tracking datasets used in this project.</li>
+      <li>Zhu L, Lee CR, Margolis DJ, Najafizadeh L (2018). Decoding cortical brain states from widefield calcium imaging data using visibility graph. <em>Biomedical Optics Express</em>, 9(7), 3017&ndash;3036.</li>
+      <li>Pereira TD, et al. EDGE: Education in Data and Guided Exploration. Salk Institute / UC San Diego. Calcium imaging and behavioral tracking datasets used in this project.</li>
     </ol>
   </div>
 </section>
