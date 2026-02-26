@@ -11,6 +11,17 @@
 </head>
 <body>
 
+<!-- Navigation Bar -->
+<nav class="site-nav">
+  <div class="nav-inner">
+    <span class="nav-title">Neural Oscillations</span>
+    <div class="nav-tabs">
+      <a href="index.html" class="nav-tab active">Paper</a>
+      <a href="appendix.html" class="nav-tab">Appendix</a>
+    </div>
+  </div>
+</nav>
+
 <!-- ============================================================
      Section 1: Hero
      ============================================================ -->
@@ -271,7 +282,7 @@
   <div class="figure-wide reveal">
     <div class="figure">
       <img src="figures/fig-q1-band-power.png" alt="Bar chart comparing band power between social and solo conditions, with Cohen's d effect sizes">
-      <p class="figure-caption"><strong>Figure 7.</strong> Left: mean band power (log scale) during social vs. solo epochs across all neurons and sessions. Right: Cohen's d effect sizes with 95% bootstrap confidence intervals. Theta shows the largest effect (d&nbsp;=&nbsp;0.235), followed by delta (d&nbsp;=&nbsp;0.165). All comparisons p&nbsp;&lt;&nbsp;0.001 after Bonferroni correction.</p>
+      <p class="figure-caption"><strong>Figure 7.</strong> Left: mean band power (log scale) during social vs. solo epochs across all neurons and sessions. Right: Cohen's d effect sizes with 95% bootstrap confidence intervals. Theta shows the largest effect (d&nbsp;=&nbsp;0.235), followed by delta (d&nbsp;=&nbsp;0.069). All comparisons p&nbsp;&lt;&nbsp;0.001 after Bonferroni correction.</p>
     </div>
   </div>
 
@@ -316,7 +327,7 @@
     <p class="section-label">Classification</p>
     <h2>Only the Minority Predicts Behavior</h2>
     <p>
-      We trained linear classifiers (LDA, SVM, Logistic Regression) on spectral features extracted from each cluster separately, using GroupKFold cross-validation by session. Classification performance was validated against a permutation test baseline (1,000 shuffles).
+      We trained linear classifiers (LDA, SVM, Logistic Regression) on spectral features extracted from each cluster separately, using GroupKFold cross-validation by session. Classification performance was validated against a permutation test baseline (100 shuffles).
     </p>
   </div>
 
@@ -423,7 +434,6 @@
       <li>Tibau E, Valencia M, Soriano J (2013). Identification of neuronal network properties from the spectral analysis of calcium imaging signals in neuronal cultures. <em>Frontiers in Neural Circuits</em>, 7, 199.</li>
       <li>Schultheiss NW, et al. (2020). Awake delta and theta-rhythmic hippocampal network modes during intermittent locomotor behaviors in the rat. <em>Behavioral Neuroscience</em>, 134(6), 529&ndash;546.</li>
       <li>Donoghue T, Dominguez J, Voytek B (2020). Electrophysiological frequency band ratio measures conflate periodic and aperiodic neural activity. <em>eNeuro</em>, 7(6), ENEURO.0192-20.2020.</li>
-      <li>Cohen MX (2019). A better way to define and describe Morlet wavelets for time-frequency analysis. <em>NeuroImage</em>, 199, 81&ndash;86.</li>
       <li>Pereira TD, et al. EDGE: Educating &amp; Developing scholars in Genomics and Engineering. Salk Institute / UC San Diego. Calcium imaging and behavioral tracking datasets used in this project.</li>
     </ol>
   </div>

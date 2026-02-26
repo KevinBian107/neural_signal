@@ -631,3 +631,286 @@ footer a {
     right: 10px;
   }
 }
+
+/* ============================================================
+   Site Navigation Bar
+   ============================================================ */
+.site-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  background: rgba(15, 15, 35, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: 'Inter', sans-serif;
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  height: 48px;
+}
+
+.nav-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.04em;
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 0;
+}
+
+.nav-tab {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  padding: 0.85em 1.2em;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+  text-decoration: none;
+}
+
+.nav-tab:hover {
+  color: rgba(255, 255, 255, 0.8);
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-tab.active {
+  color: #fff;
+  border-bottom-color: var(--accent);
+}
+
+/* ============================================================
+   Appendix Page Styles
+   ============================================================ */
+.appendix-body {
+  padding-top: 48px;
+}
+
+.appendix-header {
+  background: var(--hero-bg);
+  color: #fff;
+  padding: 5rem 0 3rem;
+  text-align: center;
+}
+
+.appendix-header h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5em;
+  color: #fff;
+}
+
+.appendix-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(0.85rem, 1.8vw, 1.05rem);
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Table of Contents */
+.toc-section {
+  background: var(--bg-alt);
+  padding: 3rem 0;
+}
+
+.toc-section h2 {
+  font-size: 1.3rem;
+  margin-bottom: 1em;
+}
+
+.toc-list {
+  padding-left: 1.4em;
+  columns: 2;
+  column-gap: 2rem;
+  line-height: 2.2;
+}
+
+.toc-list li {
+  break-inside: avoid;
+}
+
+.toc-list a {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  color: var(--text-light);
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.toc-list a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Method Note Callout */
+.method-note {
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.06), rgba(52, 152, 219, 0.02));
+  border-left: 4px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  padding: 1em 1.3em;
+  margin: 1.5rem 0;
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.method-note strong {
+  color: var(--accent);
+}
+
+.method-note ul {
+  margin: 0.5em 0 0 1.2em;
+  line-height: 1.8;
+}
+
+/* Parameter Justification Box */
+.param-box {
+  background: linear-gradient(135deg, rgba(243, 156, 18, 0.06), rgba(243, 156, 18, 0.02));
+  border-left: 4px solid #e67e22;
+  border-radius: 0 6px 6px 0;
+  padding: 1em 1.3em;
+  margin: 1.5rem 0;
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.param-box strong {
+  color: #d35400;
+}
+
+.param-box ul {
+  margin: 0.5em 0 0 1.2em;
+  line-height: 1.8;
+}
+
+/* Math Block */
+.math-block {
+  margin: 1.2em 0;
+  text-align: center;
+  overflow-x: auto;
+  padding: 0.5em 0;
+}
+
+/* Method Tables */
+.method-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+}
+
+.method-table th {
+  background: var(--bg-alt);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75em 1em;
+  border-bottom: 2px solid var(--border);
+  color: var(--text);
+}
+
+.method-table td {
+  padding: 0.65em 1em;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-light);
+  vertical-align: top;
+}
+
+.method-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Back to Top Button */
+.back-to-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s, transform 0.3s, background 0.2s;
+  pointer-events: none;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.back-to-top:hover {
+  background: #2980b9;
+  border-bottom-color: transparent;
+}
+
+/* Appendix section headings with proper scroll offset */
+.appendix-body section[id] {
+  scroll-margin-top: 60px;
+}
+
+/* Appendix ordered lists inside content */
+.appendix-body section ol:not(.toc-list):not(.references),
+.appendix-body section ul {
+  padding-left: 1.4em;
+  margin-bottom: 1em;
+  line-height: 1.8;
+}
+
+.appendix-body section ol ol {
+  list-style-type: lower-alpha;
+}
+
+/* Responsive appendix */
+@media (max-width: 768px) {
+  .toc-list {
+    columns: 1;
+  }
+
+  .appendix-header {
+    padding: 4rem 0 2rem;
+  }
+
+  .method-table {
+    font-size: 0.78rem;
+  }
+
+  .method-table th,
+  .method-table td {
+    padding: 0.5em 0.6em;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-title {
+    display: none;
+  }
+
+  .nav-tabs {
+    width: 100%;
+    justify-content: center;
+  }
+}

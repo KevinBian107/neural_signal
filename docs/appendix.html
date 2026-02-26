@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appendix: Methods &mdash; Decoding Social Intent from Neural Oscillations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+</head>
+<body class="appendix-body">
+
+<!-- Navigation Bar -->
+<nav class="site-nav">
+  <div class="nav-inner">
+    <span class="nav-title">Neural Oscillations</span>
+    <div class="nav-tabs">
+      <a href="index.html" class="nav-tab">Paper</a>
+      <a href="appendix.html" class="nav-tab active">Appendix</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Appendix Header -->
+<header class="appendix-header">
+  <div class="container">
+    <p class="section-label">Appendix</p>
+    <h1>Methods in Detail</h1>
+    <p class="appendix-subtitle">A step-by-step guide to every method used in this project, explained from first principles. No prior college math required &mdash; just curiosity.</p>
+  </div>
+</header>
+
+<!-- Table of Contents -->
+<section class="toc-section">
+  <div class="container">
+    <h2>Table of Contents</h2>
+    <ol class="toc-list">
+      <li><a href="#signals">What is a Neural Signal?</a></li>
+      <li><a href="#sampling">Sampling and the Nyquist Limit</a></li>
+      <li><a href="#preprocessing">Preprocessing: Cleaning the Data</a></li>
+      <li><a href="#smi">Social Modulation Index</a></li>
+      <li><a href="#fourier">The Fourier Transform: Decomposing Signals</a></li>
+      <li><a href="#welch">Power Spectral Density (Welch's Method)</a></li>
+      <li><a href="#bands">Frequency Bands and Band Power</a></li>
+      <li><a href="#filtering">Bandpass Filtering (Butterworth Filter)</a></li>
+      <li><a href="#hilbert">The Hilbert Transform and Signal Envelope</a></li>
+      <li><a href="#features">Feature Extraction Pipeline</a></li>
+      <li><a href="#classification">Machine Learning: Classification</a></li>
+      <li><a href="#crossval">Cross-Validation: Preventing Cheating</a></li>
+      <li><a href="#permutation">Permutation Testing</a></li>
+      <li><a href="#effectsize">Effect Size: Cohen's d</a></li>
+      <li><a href="#correction">Multiple Comparison Correction</a></li>
+      <li><a href="#clustering">K-Means Clustering</a></li>
+      <li><a href="#spatial">Spatial Analysis</a></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================
+     A1: What is a Neural Signal?
+     ============================================================ -->
+<section id="signals">
+  <div class="container reveal">
+    <p class="section-label">A1</p>
+    <h2>What is a Neural Signal?</h2>
+
+    <h3>Neurons communicate with electricity</h3>
+    <p>
+      Your brain contains roughly 86 billion neurons, each one a tiny cell that sends and receives electrical signals. When a neuron "fires," it generates a brief electrical pulse called an <strong>action potential</strong> &mdash; a spike of voltage that travels down the cell and triggers the release of chemicals to the next neuron. This is how your brain processes everything from vision to memory to social behavior.
+    </p>
+
+    <h3>Calcium imaging: watching neurons light up</h3>
+    <p>
+      We can't easily measure electrical signals from hundreds of neurons at once in a living, moving mouse. Instead, we use a technique called <strong>calcium imaging</strong>. Here's how it works:
+    </p>
+    <ol>
+      <li>Scientists genetically engineer neurons to produce a special protein called <strong>GCaMP6</strong>. This protein <em>glows</em> (fluoresces) when calcium ions are present.</li>
+      <li>When a neuron fires, calcium floods into the cell, making the GCaMP protein glow brighter.</li>
+      <li>A tiny microscope implanted on the mouse's head captures these flashes of light, producing a video of neural activity.</li>
+    </ol>
+    <p>
+      The result is a <strong>time series</strong> for each neuron &mdash; a sequence of brightness values recorded 30 times per second. When a neuron fires, we see a bump in brightness; when it's quiet, the brightness stays low.
+    </p>
+
+    <div class="method-note">
+      <strong>Important limitation:</strong> The GCaMP protein responds slowly &mdash; it takes about 600 milliseconds to decay back to baseline after a spike. This means very fast neural fluctuations (above ~7 Hz) are blurred out. Think of it like a camera with a slow shutter speed: fast motion gets smeared. This is why our analysis focuses on frequencies below 7 Hz.
+    </div>
+
+    <h3>Our dataset</h3>
+    <p>
+      We recorded from <strong>3,938 neurons</strong> across <strong>18 sessions</strong> in mice performing social behavior experiments. Each session captures about 5 minutes of activity at 30 frames per second (fps), giving us thousands of data points per neuron.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     A2: Sampling and the Nyquist Limit
+     ============================================================ -->
+<section id="sampling">
+  <div class="container reveal">
+    <p class="section-label">A2</p>
+    <h2>Sampling and the Nyquist Limit</h2>
+
+    <h3>What does "30 Hz" mean?</h3>
+    <p>
+      Our microscope takes 30 snapshots per second. In signal processing, this is called the <strong>sampling rate</strong>, written as \( f_s = 30 \) Hz (Hz means "per second"). Each snapshot gives us one number (the brightness of that neuron at that instant).
+    </p>
+
+    <h3>The flipbook analogy</h3>
+    <p>
+      Imagine making a flipbook of someone waving their hand. If you draw 30 pages per second, you can capture the motion smoothly. But what if the person is vibrating their hand 20 times per second? Your 30-page flipbook can't capture that &mdash; the motion would look weird and distorted. This distortion is called <strong>aliasing</strong>.
+    </p>
+
+    <h3>The Nyquist-Shannon Theorem</h3>
+    <p>
+      The Nyquist-Shannon sampling theorem tells us the highest frequency we can accurately measure:
+    </p>
+    <div class="math-block">
+      $$ f_{\text{max}} = \frac{f_s}{2} $$
+    </div>
+    <p>
+      This \( f_{\text{max}} \) is called the <strong>Nyquist frequency</strong>. For our recording:
+    </p>
+    <div class="math-block">
+      $$ f_{\text{max}} = \frac{30}{2} = 15 \text{ Hz} $$
+    </div>
+    <p>
+      So we can theoretically detect oscillations up to 15 Hz. But remember, the GCaMP protein blurs everything above ~7 Hz, so in practice our useful range is about <strong>0.01 to 7 Hz</strong>.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     A3: Preprocessing
+     ============================================================ -->
+<section id="preprocessing">
+  <div class="container reveal">
+    <p class="section-label">A3</p>
+    <h2>Preprocessing: Cleaning the Data</h2>
+
+    <h3>The problem: drift</h3>
+    <p>
+      Raw calcium signals often have a slow downward drift called <strong>photobleaching</strong> &mdash; the fluorescent protein gradually loses brightness over time, like a glow stick fading. This drift is an artifact, not neural activity, and we need to remove it before analysis.
+    </p>
+
+    <h3>Linear detrending</h3>
+    <p>
+      Detrending fits a straight line through the signal and subtracts it. If the original signal is \( x(t) \), we find the best-fit line \( \hat{x}(t) = at + b \) and compute:
+    </p>
+    <div class="math-block">
+      $$ x_{\text{detrended}}(t) = x(t) - (at + b) $$
+    </div>
+    <p>
+      where \( a \) is the slope (rate of drift) and \( b \) is the intercept. This removes any steady upward or downward trend, leaving only the fluctuations we care about.
+    </p>
+
+    <h3>Behavior label resampling</h3>
+    <p>
+      Our behavior video runs at <strong>25 fps</strong> but calcium imaging runs at <strong>30 fps</strong>. To align them, we <strong>resample</strong> the behavior labels using nearest-neighbor interpolation &mdash; for each calcium frame, we pick the behavior label from the closest behavior frame in time. This gives us a matched behavior label (social or solo) for every neural data point.
+    </p>
+    <p>
+      Mathematically, if we have \( n \) behavior frames and need \( m \) calcium-matched frames:
+    </p>
+    <div class="math-block">
+      $$ \text{idx}[i] = \text{round}\!\left(\frac{i \cdot (n-1)}{m-1}\right), \quad i = 0, 1, \ldots, m-1 $$
+    </div>
+
+    <h3>Defining "social"</h3>
+    <p>
+      Behavior video is processed through <strong>SLEAP</strong>, a deep-learning pose tracker that identifies 15 body keypoints on each animal. We define a frame as "social" when the resident mouse's nose is within <strong>10 pixels</strong> of the intruder's nearest body part.
+    </p>
+
+    <div class="param-box">
+      <strong>Why 10 pixels?</strong> This threshold was set based on visual inspection of the behavior videos. At the camera resolution used, 10 pixels corresponds roughly to direct nose-to-body contact. Larger thresholds would include frames where the mice are nearby but not actually interacting; smaller thresholds would miss interactions where the pose tracker has slight inaccuracies. The choice reflects a practical balance between sensitivity and specificity.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     A4: Social Modulation Index
+     ============================================================ -->
+<section id="smi">
+  <div class="container reveal">
+    <p class="section-label">A4</p>
+    <h2>Social Modulation Index</h2>
+
+    <h3>Quantifying how each neuron responds to social contact</h3>
+    <p>
+      Before diving into frequency analysis, we wanted a simple number that captures whether a neuron is more active during social contact or less active. The <strong>Social Modulation Index (SMI)</strong> is the normalized difference in mean activity between social and solo periods:
+    </p>
+    <div class="math-block">
+      $$ \text{SMI} = \frac{\bar{x}_{\text{social}} - \bar{x}_{\text{solo}}}{\bar{x}_{\text{social}} + \bar{x}_{\text{solo}}} $$
+    </div>
+    <p>
+      where \( \bar{x}_{\text{social}} \) is the neuron's mean fluorescence during social frames and \( \bar{x}_{\text{solo}} \) is the mean during solo frames.
+    </p>
+
+    <h3>Interpreting the SMI</h3>
+    <ul>
+      <li><strong>SMI = +1</strong>: The neuron is exclusively active during social contact (silent during solo)</li>
+      <li><strong>SMI = 0</strong>: No difference between social and solo activity</li>
+      <li><strong>SMI = &minus;1</strong>: The neuron is exclusively suppressed during social contact</li>
+    </ul>
+    <p>
+      We found that <strong>87% of neurons</strong> show significant modulation, but in both directions &mdash; some increase activity during social contact, others decrease. This heterogeneity is a key finding: a simple population average would cancel out opposing responses and miss the signal entirely.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     A5: The Fourier Transform
+     ============================================================ -->
+<section id="fourier">
+  <div class="container reveal">
+    <p class="section-label">A5</p>
+    <h2>The Fourier Transform: Decomposing Signals</h2>
+
+    <h3>The music analogy</h3>
+    <p>
+      When you hear a chord on a piano, your ear perceives a single sound. But that sound is actually several notes (frequencies) playing at once &mdash; maybe a C, an E, and a G. A <strong>spectrum analyzer</strong> can separate the chord back into its individual notes, showing you which frequencies are present and how loud each one is.
+    </p>
+    <p>
+      The <strong>Fourier Transform</strong> does exactly the same thing for any signal. It takes a signal that varies over time and tells you which frequencies are present and how strong each one is.
+    </p>
+
+    <h3>The key idea</h3>
+    <p>
+      Any signal &mdash; no matter how complicated &mdash; can be written as a sum of sine waves at different frequencies. Each sine wave is described by:
+    </p>
+    <ul>
+      <li><strong>Frequency</strong> (\( f \)): how fast it oscillates (cycles per second)</li>
+      <li><strong>Amplitude</strong> (\( A \)): how tall the wave is (its strength)</li>
+      <li><strong>Phase</strong> (\( \phi \)): where in its cycle the wave starts</li>
+    </ul>
+
+    <h3>The Discrete Fourier Transform (DFT)</h3>
+    <p>
+      Since our data consists of discrete samples (not a continuous curve), we use the <strong>Discrete Fourier Transform</strong>. Given \( N \) data points \( x[0], x[1], \ldots, x[N-1] \), the DFT computes:
+    </p>
+    <div class="math-block">
+      $$ X[k] = \sum_{n=0}^{N-1} x[n] \cdot e^{-j \, 2\pi \, kn / N} $$
+    </div>
+    <p>
+      Let's break this down piece by piece:
+    </p>
+    <ul>
+      <li>\( x[n] \) &mdash; the \( n \)-th sample of our signal (the brightness of a neuron at time step \( n \))</li>
+      <li>\( X[k] \) &mdash; the Fourier coefficient for frequency bin \( k \). This is a complex number that encodes both the amplitude and phase at that frequency.</li>
+      <li>\( e^{-j \, 2\pi \, kn / N} \) &mdash; a rotating complex exponential. By Euler's formula, this equals \( \cos(2\pi kn/N) - j\sin(2\pi kn/N) \). It's essentially asking: "how much does the signal look like a sine wave at frequency \( k \)?"</li>
+      <li>\( j \) &mdash; the imaginary unit (\( j = \sqrt{-1} \)), used because the Fourier Transform tracks both the "cosine part" and the "sine part" of each frequency.</li>
+      <li>\( N \) &mdash; total number of samples</li>
+    </ul>
+    <p>
+      The <strong>power</strong> at frequency \( k \) is:
+    </p>
+    <div class="math-block">
+      $$ P[k] = |X[k]|^2 = \text{Re}(X[k])^2 + \text{Im}(X[k])^2 $$
+    </div>
+    <p>
+      This tells you how much energy the signal has at that frequency &mdash; a bigger number means that frequency is more prominent in the signal.
+    </p>
+
+    <div class="method-note">
+      <strong>Real-world frequency:</strong> Frequency bin \( k \) corresponds to a real-world frequency of \( f = k \cdot f_s / N \) Hz. For example, with \( f_s = 30 \) Hz and \( N = 300 \) samples, bin \( k = 10 \) corresponds to \( 10 \times 30/300 = 1 \) Hz.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     A6: Power Spectral Density (Welch's Method)
+     ============================================================ -->
+<section id="welch">
+  <div class="container reveal">
+    <p class="section-label">A6</p>
+    <h2>Power Spectral Density: Welch's Method</h2>
+
+    <h3>Why not just one big Fourier Transform?</h3>
+    <p>
+      If we compute a single Fourier Transform on the entire signal, we get a very noisy estimate &mdash; random fluctuations make it hard to see the true frequency content. It's like trying to judge someone's average running speed from a single 1-second clip vs. watching them run for 10 minutes.
+    </p>
+
+    <h3>Welch's trick: divide, window, average</h3>
+    <p>
+      <strong>Welch's method</strong> (1967) gives a much smoother, more reliable estimate by:
+    </p>
+    <ol>
+      <li><strong>Divide</strong> the signal into overlapping segments</li>
+      <li><strong>Window</strong> each segment (multiply by a smooth tapering function)</li>
+      <li><strong>Compute the FFT</strong> of each windowed segment</li>
+      <li><strong>Average</strong> the results across all segments</li>
+    </ol>
+
+    <h3>Step 1: Segmentation</h3>
+    <p>
+      We chop the signal into segments of length \( L \) samples, with adjacent segments overlapping by \( D \) samples. This overlap ensures we don't miss anything that falls on a segment boundary.
+    </p>
+
+    <h3>Step 2: Windowing</h3>
+    <p>
+      Each segment is multiplied by a <strong>window function</strong> \( w[n] \) that smoothly tapers to zero at the edges. We use the <strong>Hann window</strong>:
+    </p>
+    <div class="math-block">
+      $$ w[n] = 0.5 \left(1 - \cos\!\left(\frac{2\pi n}{L - 1}\right)\right), \quad n = 0, 1, \ldots, L-1 $$
+    </div>
+    <p>
+      Why window? Without it, the abrupt edges of each segment create artificial high-frequency artifacts (called <strong>spectral leakage</strong>). The Hann window smoothly fades the signal to zero at the edges, reducing this leakage. Think of it like gently fading a song in and out instead of abruptly cutting it mid-note.
+    </p>
+
+    <h3>Step 3: Compute and average</h3>
+    <p>
+      For each windowed segment, compute the FFT and take the squared magnitude. Then average across all \( K \) segments:
+    </p>
+    <div class="math-block">
+      $$ \hat{S}(f_k) = \frac{1}{K} \sum_{i=1}^{K} \frac{1}{L \cdot U} \left| \sum_{n=0}^{L-1} w[n] \cdot x_i[n] \cdot e^{-j2\pi f_k n / f_s} \right|^2 $$
+    </div>
+    <p>
+      where \( U = \frac{1}{L}\sum_{n=0}^{L-1} w[n]^2 \) corrects for the energy lost by windowing.
+    </p>
+
+    <div class="method-note">
+      <strong>In our project we use Welch PSD in two contexts with different parameters:</strong>
+      <ul>
+        <li><strong>Neuron spectral profiling</strong> (characterizing each neuron's overall frequency content): segment length = 300 samples (10 seconds), overlap = 50%, FFT size = 1024</li>
+        <li><strong>Windowed classification</strong> (extracting features from 1-second behavioral epochs): segment length = 30 samples (1 second), overlap = 50%, FFT size = 1024</li>
+      </ul>
+    </div>
+
+    <div class="param-box">
+      <strong>Why these specific parameters?</strong>
+      <ul>
+        <li><strong>10-second segments for profiling:</strong> Longer windows give better frequency resolution. A 10-second window can resolve frequencies as fine as \( 1/10 = 0.1 \) Hz, which is needed to distinguish our infraslow (0.01&ndash;0.1 Hz) and slow (0.1&ndash;1 Hz) bands.</li>
+        <li><strong>1-second segments for classification:</strong> This matches the 1-second behavioral windows we classify (see <a href="#features">Feature Extraction</a>). We can't use longer segments here because each window needs a single behavioral label.</li>
+        <li><strong>50% overlap:</strong> This is the standard overlap for Hann-windowed Welch estimation. It balances statistical efficiency with computational cost.</li>
+        <li><strong>FFT size of 1024:</strong> The signal is zero-padded to 1024 points before the FFT. This doesn't add new information, but it interpolates the frequency axis so we get smoother-looking PSD curves. The resulting frequency spacing is \( 30/1024 \approx 0.029 \) Hz.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     A7: Frequency Bands
+     ============================================================ -->
+<section id="bands">
+  <div class="container reveal">
+    <p class="section-label">A7</p>
+    <h2>Frequency Bands and Band Power</h2>
+
+    <h3>Grouping frequencies by range</h3>
+    <p>
+      Rather than looking at every individual frequency, neuroscientists group frequencies into <strong>bands</strong> &mdash; ranges that are associated with different types of brain activity. Think of it like grouping colors: instead of tracking every wavelength of light, we talk about "red," "blue," and "green."
+    </p>
+
+    <table class="method-table">
+      <thead>
+        <tr>
+          <th>Band Name</th>
+          <th>Frequency Range</th>
+          <th>Period</th>
+          <th>What It Captures</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Infraslow</strong></td>
+          <td>0.01 &ndash; 0.1 Hz</td>
+          <td>10 &ndash; 100 seconds</td>
+          <td>Very slow drifts; partly photobleaching artifact</td>
+        </tr>
+        <tr>
+          <td><strong>Slow</strong></td>
+          <td>0.1 &ndash; 1.0 Hz</td>
+          <td>1 &ndash; 10 seconds</td>
+          <td>Network-level synchronization patterns</td>
+        </tr>
+        <tr>
+          <td><strong>Delta</strong></td>
+          <td>1.0 &ndash; 4.0 Hz</td>
+          <td>0.25 &ndash; 1 second</td>
+          <td>Slow rhythmic activity</td>
+        </tr>
+        <tr>
+          <td><strong>Theta</strong></td>
+          <td>4.0 &ndash; 7.0 Hz</td>
+          <td>0.14 &ndash; 0.25 seconds</td>
+          <td>Linked to social behavior and attention</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="param-box">
+      <strong>Why these band boundaries?</strong> The band names (delta, theta, etc.) come from decades of EEG research. Our specific boundaries follow Kuga et al. (2022), the electrophysiology study that first linked prefrontal theta to social behavior. The upper limit of 7 Hz (rather than the traditional EEG theta ceiling of 8 Hz) reflects the bandwidth limit of calcium imaging &mdash; GCaMP6s cannot reliably resolve frequencies above ~7 Hz due to its slow decay dynamics. We stop at theta because everything above it is unreliable in our data.
+    </div>
+
+    <h3>Band power: adding up energy in a range</h3>
+    <p>
+      To get the total power in a frequency band, we <strong>integrate</strong> (add up) the PSD values within that band's frequency range. We use the <strong>trapezoidal rule</strong>, which approximates the area under the PSD curve by summing up trapezoids:
+    </p>
+    <div class="math-block">
+      $$ P_{\text{band}} = \int_{f_{\text{lo}}}^{f_{\text{hi}}} S(f) \, df \approx \sum_{i} \frac{(f_{i+1} - f_i)\big(S(f_i) + S(f_{i+1})\big)}{2} $$
+    </div>
+    <p>
+      where \( f_{\text{lo}} \) and \( f_{\text{hi}} \) are the band boundaries, and \( S(f) \) is the PSD value at frequency \( f \).
+    </p>
+
+    <h3>Fractional band power</h3>
+    <p>
+      To compare neurons fairly (regardless of how bright or dim they are overall), we normalize each band's power by the total power across all bands:
+    </p>
+    <div class="math-block">
+      $$ P_{\text{frac}}^{(\text{band})} = \frac{P_{\text{band}}}{P_{\text{infraslow}} + P_{\text{slow}} + P_{\text{delta}} + P_{\text{theta}}} $$
+    </div>
+    <p>
+      This gives a number between 0 and 1 for each band. If a neuron has \( P_{\text{frac}}^{(\theta)} = 0.25 \), then 25% of its total power is in the theta band. This fractional representation is what we use for clustering neurons into spectral types.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     A8: Bandpass Filtering
+     ============================================================ -->
+<section id="filtering">
+  <div class="container reveal">
+    <p class="section-label">A8</p>
+    <h2>Bandpass Filtering: The Butterworth Filter</h2>
+
+    <h3>The radio tuner analogy</h3>
+    <p>
+      A bandpass filter is like a radio tuner &mdash; it lets through signals in a specific frequency range and blocks everything else. If you tune to 4&ndash;7 Hz (the theta band), the filter passes only theta oscillations and suppresses everything slower or faster.
+    </p>
+
+    <h3>What a filter does mathematically</h3>
+    <p>
+      A filter takes an input signal \( x[n] \) and produces an output \( y[n] \) where certain frequencies are amplified or suppressed. The <strong>frequency response</strong> \( H(f) \) describes how much each frequency is let through:
+    </p>
+    <ul>
+      <li>\( |H(f)| = 1 \): the frequency passes through unchanged</li>
+      <li>\( |H(f)| = 0 \): the frequency is completely blocked</li>
+      <li>Values in between: partial attenuation</li>
+    </ul>
+
+    <h3>The Butterworth filter</h3>
+    <p>
+      We use a <strong>Butterworth filter</strong>, chosen because it has the smoothest possible frequency response &mdash; no ripples in the passband (the frequencies we want to keep). For an order-\( N \) Butterworth low-pass filter, the magnitude response is:
+    </p>
+    <div class="math-block">
+      $$ |H(f)|^2 = \frac{1}{1 + \left(\frac{f}{f_c}\right)^{2N}} $$
+    </div>
+    <p>
+      where \( f_c \) is the cutoff frequency and \( N \) is the filter order. Higher order means a sharper transition between passing and blocking.
+    </p>
+    <p>
+      For a <strong>bandpass</strong> filter (which we use), two cutoff frequencies define the passband: \( f_{\text{lo}} \) and \( f_{\text{hi}} \). Frequencies between them pass through; frequencies outside are attenuated.
+    </p>
+
+    <div class="param-box">
+      <strong>Why a 4th-order filter?</strong> Filter order controls how sharply the filter transitions from "passing" to "blocking." Order 4 is a standard choice in neuroscience &mdash; it provides a reasonably sharp rolloff without introducing numerical instability or excessive distortion (ringing artifacts). Higher orders would give sharper cutoffs but are more prone to numerical errors, especially at the very low frequencies we work with (0.01 Hz).
+    </div>
+
+    <h3>SOS form: numerical stability</h3>
+    <p>
+      Filters can be implemented in different mathematical forms. We use <strong>Second-Order Sections (SOS)</strong> form, which chains together small 2nd-order filters instead of one big filter. This prevents numerical errors that happen when filtering at very low frequencies (like our infraslow band at 0.01 Hz). At such low frequencies relative to the sampling rate, the standard filter representation can lose precision, but SOS avoids this entirely.
+    </p>
+
+    <h3>Zero-phase filtering</h3>
+    <p>
+      Normal filtering introduces a time delay &mdash; the output is slightly shifted in time relative to the input. We use <strong>zero-phase filtering</strong> (<code>sosfiltfilt</code>), which applies the filter twice: once forward and once backward. The forward pass introduces a delay; the backward pass cancels it out exactly. The result has no time shift, which is critical for comparing band envelopes against behavioral timestamps.
+    </p>
+
+    <div class="method-note">
+      <strong>How it's used:</strong> We apply the bandpass filter to decompose each neuron's calcium trace into four separate signals &mdash; one for each frequency band (infraslow, slow, delta, theta). This decomposition is shown in Figure 5 of the main paper.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     A9: Hilbert Transform
+     ============================================================ -->
+<section id="hilbert">
+  <div class="container reveal">
+    <p class="section-label">A9</p>
+    <h2>The Hilbert Transform and Signal Envelope</h2>
+
+    <h3>What is an "envelope"?</h3>
+    <p>
+      After bandpass filtering, we get a signal that oscillates up and down at the band's frequency. But what we really want to know is: <em>how strong are those oscillations at each moment?</em> The <strong>envelope</strong> traces the outline of the oscillations &mdash; it shows when they're big vs. small, without the rapid up-and-down itself.
+    </p>
+    <p>
+      Think of someone speaking into a microphone. The raw audio oscillates rapidly (the actual sound waves), but the envelope shows when they're speaking loudly vs. softly.
+    </p>
+
+    <h3>The analytic signal</h3>
+    <p>
+      The <strong>Hilbert Transform</strong> creates an <strong>analytic signal</strong> &mdash; a complex-valued version of the original that encodes both the oscillation and its envelope. Given a real signal \( x(t) \), the analytic signal is:
+    </p>
+    <div class="math-block">
+      $$ z(t) = x(t) + j \cdot \mathcal{H}\{x(t)\} $$
+    </div>
+    <p>
+      where \( \mathcal{H}\{x(t)\} \) is the Hilbert Transform (essentially a 90-degree phase shift of the original signal) and \( j = \sqrt{-1} \).
+    </p>
+
+    <h3>Extracting the envelope</h3>
+    <p>
+      The envelope is the magnitude of the analytic signal:
+    </p>
+    <div class="math-block">
+      $$ A(t) = |z(t)| = \sqrt{x(t)^2 + \mathcal{H}\{x(t)\}^2} $$
+    </div>
+    <p>
+      This gives a smooth, non-negative curve that traces the peaks of the oscillation.
+    </p>
+
+    <div class="method-note">
+      <strong>How it's used:</strong> In Figure 5 of the main paper, each frequency band row shows both the filtered oscillation and its Hilbert envelope (the smooth outline). This lets you visually see how band-specific activity changes during social vs. solo periods.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     A10: Feature Extraction Pipeline
+     ============================================================ -->
+<section id="features">
+  <div class="container reveal">
+    <p class="section-label">A10</p>
+    <h2>Feature Extraction Pipeline</h2>
+
+    <h3>From raw signals to numbers a computer can learn from</h3>
+    <p>
+      Machine learning algorithms can't directly understand raw calcium traces. We need to convert each time window into a fixed set of meaningful numbers called <strong>features</strong>. Here's our pipeline:
+    </p>
+
+    <h3>Step 1: Windowing and labeling</h3>
+    <p>
+      We divide each neuron's signal into <strong>1-second, non-overlapping windows</strong> (30 frames each at 30 fps). Each window is labeled based on the mouse's behavior during that second:
+    </p>
+    <ul>
+      <li><strong>Social:</strong> at least 70% of frames in the window are social</li>
+      <li><strong>Solo:</strong> at most 30% of frames are social</li>
+      <li><strong>Discarded:</strong> anything in between (mixed states are ambiguous)</li>
+    </ul>
+
+    <div class="param-box">
+      <strong>Why 1-second windows?</strong> This was a practical choice balancing two competing needs:
+      <ul>
+        <li><strong>Shorter windows</strong> (e.g., 0.5 seconds) would give more data points for classification but would make frequency estimation unreliable &mdash; you need at least one full cycle of an oscillation to measure its frequency, and at 1 Hz (the bottom of delta band), one cycle takes 1 second.</li>
+        <li><strong>Longer windows</strong> (e.g., 5 seconds) would give better frequency estimates but fewer labeled windows (less training data) and more ambiguous labels (behavior often changes within a 5-second span).</li>
+      </ul>
+      1 second was the shortest window that still allows the Welch PSD to estimate power in all four frequency bands, while maximizing the number of cleanly labeled windows. We didn't run a formal optimization &mdash; this is a standard-ish choice in the neuroscience literature for behavioral epoch analysis.
+    </div>
+
+    <div class="param-box">
+      <strong>Why 70% purity?</strong> We need each window's label to be trustworthy. At 70%, at least 21 of the 30 frames must agree on the behavioral state. Windows where the mouse is transitioning between social and solo (e.g., 50/50) are genuinely ambiguous &mdash; including them would add noise to our classification. Stricter thresholds (like 90%) were too aggressive and discarded too many usable windows; looser thresholds (like 60%) included too many mixed-state windows. 70% was a middle ground.
+    </div>
+
+    <h3>Step 2: Per-window processing</h3>
+    <p>For each 1-second window, we:</p>
+    <ol>
+      <li>Apply <strong>linear detrending</strong> to remove any drift within the window</li>
+      <li>Compute the <strong>Welch PSD</strong></li>
+      <li>Integrate PSD in each frequency band to get <strong>band powers</strong></li>
+      <li>Compute <strong>spectral entropy</strong> from the PSD</li>
+      <li>Compute the <strong>theta/delta ratio</strong></li>
+    </ol>
+
+    <h3>Step 3: The 6 features</h3>
+    <p>
+      Each window becomes a 6-dimensional feature vector:
+    </p>
+    <div class="math-block">
+      $$ \mathbf{x} = \begin{bmatrix} P_{\text{infraslow}} \\ P_{\text{slow}} \\ P_{\text{delta}} \\ P_{\text{theta}} \\ H_{\text{spectral}} \\ P_{\text{theta}} / P_{\text{delta}} \end{bmatrix} $$
+    </div>
+
+    <table class="method-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>What It Captures</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Infraslow power</td><td>Very slow fluctuations (0.01&ndash;0.1 Hz)</td></tr>
+        <tr><td>Slow power</td><td>Sub-Hz oscillations (0.1&ndash;1 Hz)</td></tr>
+        <tr><td>Delta power</td><td>Slow rhythmic activity (1&ndash;4 Hz)</td></tr>
+        <tr><td>Theta power</td><td>Fast rhythmic activity (4&ndash;7 Hz)</td></tr>
+        <tr><td>Spectral entropy</td><td>How "spread out" vs. "concentrated" the power spectrum is (see below)</td></tr>
+        <tr><td>Theta/delta ratio</td><td>Relative strength of theta vs. delta &mdash; a spectral <em>shape</em> measure</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Spectral entropy: concentrated vs. spread out</h3>
+    <p>
+      Spectral entropy measures whether a neuron's power is concentrated at a few frequencies (like a tuning fork &mdash; low entropy) or spread across many frequencies (like static noise &mdash; high entropy). We normalize the PSD to sum to 1 and compute Shannon entropy:
+    </p>
+    <div class="math-block">
+      $$ H = -\sum_{i} p_i \ln(p_i), \quad \text{where } p_i = \frac{S(f_i)}{\sum_k S(f_k)} $$
+    </div>
+
+    <h3>Theta/delta ratio: the star feature</h3>
+    <p>
+      The theta/delta ratio turned out to be the most important feature for classification:
+    </p>
+    <div class="math-block">
+      $$ r_{\theta/\delta} = \frac{P_{\text{theta}}}{P_{\text{delta}} + \varepsilon} $$
+    </div>
+    <p>
+      where \( \varepsilon = 10^{-12} \) is a tiny number to avoid dividing by zero. This ratio captures the <em>shape</em> of the spectrum (which band dominates) rather than the raw <em>amount</em> of power, making it robust to differences in overall signal brightness.
+    </p>
+
+    <div class="method-note">
+      <strong>Key finding:</strong> Cluster 1 neurons use theta/delta ratio as their top discriminative feature, while the full population relies on raw theta power. This difference in strategy is one reason the minority subpopulation succeeds where the full population fails.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     A11: Classification
+     ============================================================ -->
+<section id="classification">
+  <div class="container reveal">
+    <p class="section-label">A11</p>
+    <h2>Machine Learning: Classification</h2>
+
+    <h3>The goal</h3>
+    <p>
+      Given the 6-feature vector from a time window, can a computer correctly predict whether the mouse was in a social or solo state? This is a <strong>binary classification</strong> problem &mdash; sorting data into one of two categories.
+    </p>
+
+    <h3>Feature standardization</h3>
+    <p>
+      Before training, we <strong>standardize</strong> each feature to have zero mean and unit variance:
+    </p>
+    <div class="math-block">
+      $$ x_{\text{scaled}} = \frac{x - \mu}{\sigma} $$
+    </div>
+    <p>
+      where \( \mu \) is the mean and \( \sigma \) is the standard deviation, both computed <em>only from the training data</em>. This ensures all features are on the same scale &mdash; otherwise a feature measured in thousands would dominate one measured in decimals.
+    </p>
+
+    <h3>Three classifiers</h3>
+    <p>We tested three different linear classifiers &mdash; algorithms that find a flat boundary (a hyperplane) separating social from solo in the 6-dimensional feature space:</p>
+
+    <h4>1. Linear Discriminant Analysis (LDA)</h4>
+    <p>
+      LDA assumes each class (social, solo) follows a bell-shaped (Gaussian) distribution with the same spread but different centers. It finds the direction that maximizes the separation between class centers relative to the spread within each class. Think of it as finding the angle from which two overlapping clouds of points look the most separated.
+    </p>
+
+    <h4>2. Support Vector Machine (SVM)</h4>
+    <p>
+      SVM finds the hyperplane that maximizes the <strong>margin</strong> &mdash; the distance between the decision boundary and the nearest data points from each class. Think of it as drawing a line between two groups of dots with as much empty space as possible on either side. We use a linear kernel (flat boundary) with balanced class weights.
+    </p>
+
+    <h4>3. Logistic Regression</h4>
+    <p>
+      Despite its name, logistic regression is a classification method. It models the <em>probability</em> of belonging to the social class using the logistic (sigmoid) function:
+    </p>
+    <div class="math-block">
+      $$ P(\text{social} \mid \mathbf{x}) = \frac{1}{1 + e^{-(\mathbf{w}^T \mathbf{x} + b)}} $$
+    </div>
+    <p>
+      where \( \mathbf{w} \) is a vector of learned weights (one per feature) and \( b \) is a bias term. The sigmoid function squashes any input into the range [0, 1], giving us a probability. If \( P > 0.5 \), we predict social; otherwise, solo.
+    </p>
+
+    <div class="param-box">
+      <strong>Why three classifiers instead of one?</strong> Different classifiers make different assumptions about the data. If all three give similar results, we can be more confident the finding is robust and not an artifact of a particular algorithm's quirks. All three are <em>linear</em> classifiers, meaning they look for simple, flat decision boundaries &mdash; this is intentional, because with only 6 features and modest sample sizes, complex nonlinear models would likely overfit.
+    </div>
+
+    <h3>Class balancing</h3>
+    <p>
+      If we have more solo windows than social windows, the classifier might just always guess "solo" and still get decent accuracy. To prevent this, we use <strong>balanced class weights</strong>: misclassifying a sample from the smaller class costs more than misclassifying one from the larger class, forcing the model to learn both categories.
+    </p>
+
+    <h3>AUC-ROC: measuring performance</h3>
+    <p>
+      Accuracy alone can be misleading with imbalanced data. Instead, we use the <strong>AUC-ROC</strong> (Area Under the Receiver Operating Characteristic curve).
+    </p>
+    <p>
+      The ROC curve plots the <strong>true positive rate</strong> (correctly identified social windows) against the <strong>false positive rate</strong> (solo windows incorrectly called social) as we vary the classification threshold. The AUC summarizes this entire curve as a single number:
+    </p>
+    <ul>
+      <li><strong>AUC = 0.5</strong> &mdash; random guessing (no better than flipping a coin)</li>
+      <li><strong>AUC = 1.0</strong> &mdash; perfect classification</li>
+      <li><strong>AUC = 0.570</strong> (our Cluster 1 result) &mdash; modest but statistically significant separation</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================
+     A12: Cross-Validation
+     ============================================================ -->
+<section id="crossval">
+  <div class="container reveal">
+    <p class="section-label">A12</p>
+    <h2>Cross-Validation: Preventing Cheating</h2>
+
+    <h3>Why we need it</h3>
+    <p>
+      If we train and test a classifier on the same data, it could just memorize the answers instead of learning real patterns. This is called <strong>overfitting</strong> &mdash; the model learns quirks of the training data that don't generalize. It's like studying only the answers to a specific practice test: you ace that test but fail a new one.
+    </p>
+
+    <h3>GroupKFold cross-validation</h3>
+    <p>
+      We use <strong>GroupKFold</strong> cross-validation with sessions as groups. Here's how it works:
+    </p>
+    <ol>
+      <li>Divide the 18 sessions into 5 "folds" (groups of sessions)</li>
+      <li>For each fold:
+        <ul>
+          <li>Train the classifier on all sessions <em>except</em> those in the current fold</li>
+          <li>Test on the held-out sessions</li>
+        </ul>
+      </li>
+      <li>Repeat for all 5 folds, so every session gets tested exactly once</li>
+      <li>Report the average performance across all folds</li>
+    </ol>
+
+    <div class="param-box">
+      <strong>Why "Group" KFold instead of regular KFold?</strong> Regular KFold might put windows from the same session in both the training and test sets. Since consecutive windows from the same session are correlated (neural activity doesn't change drastically from one second to the next), this would give overly optimistic results &mdash; the classifier could partly "recognize" which session a test window came from. GroupKFold prevents this entirely by keeping all windows from a given session together in either the training or test set, never both.
+    </div>
+
+    <div class="param-box">
+      <strong>Why 5 folds?</strong> We use \( n = \min(5, \text{number of sessions}) = 5 \) folds. More folds means more of the data is used for training in each round (good for learning), but each test set is smaller (noisier estimate of performance). 5-fold is a standard choice that balances these tradeoffs.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     A13: Permutation Testing
+     ============================================================ -->
+<section id="permutation">
+  <div class="container reveal">
+    <p class="section-label">A13</p>
+    <h2>Permutation Testing: Is the Result Real?</h2>
+
+    <h3>The problem</h3>
+    <p>
+      Our classifier gets an AUC of 0.570. Is that meaningfully better than chance, or could we get that just by luck? We need a way to determine if the result is statistically significant.
+    </p>
+
+    <h3>The idea: what would happen by chance?</h3>
+    <p>
+      A <strong>permutation test</strong> works by asking: "If there were <em>no real relationship</em> between neural features and behavior labels, how well would the classifier do?"
+    </p>
+    <p>
+      To answer this, we destroy the real relationship by <strong>randomly shuffling the labels</strong>. If the original labels were [social, solo, social, solo, ...], we might shuffle them to [solo, social, social, solo, ...]. Now the labels are random &mdash; they have no connection to the neural features.
+    </p>
+
+    <h3>The procedure</h3>
+    <ol>
+      <li>Compute the real AUC with the correct labels: \( \text{AUC}_{\text{real}} \)</li>
+      <li>Repeat 100 times:
+        <ol type="a">
+          <li>Randomly shuffle the behavior labels</li>
+          <li>Train and test the classifier on the shuffled data using the same cross-validation</li>
+          <li>Record the shuffled AUC: \( \text{AUC}_{\text{perm}}^{(i)} \)</li>
+        </ol>
+      </li>
+      <li>Compute the p-value:
+        <div class="math-block">
+          $$ p = \frac{\#\{\text{AUC}_{\text{perm}}^{(i)} \geq \text{AUC}_{\text{real}}\}}{n_{\text{perm}}} $$
+        </div>
+      </li>
+    </ol>
+    <p>
+      The p-value tells you: "What fraction of random shuffles did at least as well as the real classifier?" If \( p < 0.05 \), fewer than 5% of random shuffles matched or exceeded the real result, which we consider statistically significant.
+    </p>
+
+    <div class="param-box">
+      <strong>Why 100 shuffles?</strong> More shuffles give a more precise p-value estimate, but there are diminishing returns. With 100 shuffles, the smallest possible non-zero p-value is 1/100 = 0.01, which is sufficient for determining significance at the standard &alpha; = 0.05 threshold. More shuffles (e.g., 1,000) would give finer p-value resolution but at 10&times; the computational cost.
+    </div>
+
+    <div class="method-note">
+      <strong>Results:</strong>
+      <ul>
+        <li><strong>Cluster 1:</strong> AUC = 0.570, p = 0.020 (only 2% of shuffles did as well &rarr; significant)</li>
+        <li><strong>All neurons:</strong> AUC = 0.535, p = 0.196 (about 20% of shuffles did as well &rarr; not significant)</li>
+        <li><strong>Cluster 0:</strong> AUC = 0.519, p = 0.407 (about 41% of shuffles did as well &rarr; not significant)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     A14: Effect Size (Cohen's d)
+     ============================================================ -->
+<section id="effectsize">
+  <div class="container reveal">
+    <p class="section-label">A14</p>
+    <h2>Effect Size: Cohen's d</h2>
+
+    <h3>Why p-values aren't enough</h3>
+    <p>
+      A p-value tells you whether an effect <em>exists</em>, but not how <em>big</em> it is. With enough data, even a tiny, meaningless difference can be "statistically significant." Effect size measures the <em>magnitude</em> of the difference.
+    </p>
+
+    <h3>Cohen's d formula</h3>
+    <p>
+      Cohen's d measures how far apart two groups' means are, in units of their pooled standard deviation:
+    </p>
+    <div class="math-block">
+      $$ d = \frac{\bar{x}_1 - \bar{x}_2}{s_p} $$
+    </div>
+    <p>
+      where \( \bar{x}_1 \) and \( \bar{x}_2 \) are the group means (e.g., mean theta power during social vs. solo), and \( s_p \) is the <strong>pooled standard deviation</strong>:
+    </p>
+    <div class="math-block">
+      $$ s_p = \sqrt{\frac{(n_1 - 1) s_1^2 + (n_2 - 1) s_2^2}{n_1 + n_2 - 2}} $$
+    </div>
+    <p>
+      Here \( n_1 \), \( n_2 \) are the sample sizes and \( s_1^2 \), \( s_2^2 \) are the sample variances. The pooled standard deviation is a weighted average of the two groups' spreads.
+    </p>
+
+    <h3>Interpreting Cohen's d</h3>
+    <table class="method-table">
+      <thead>
+        <tr><th>|d| value</th><th>Interpretation</th><th>Analogy</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>~0.2</td><td>Small effect</td><td>Hard to see with the naked eye; real but subtle</td></tr>
+        <tr><td>~0.5</td><td>Medium effect</td><td>Noticeable if you look for it</td></tr>
+        <tr><td>~0.8</td><td>Large effect</td><td>Obvious to anyone</td></tr>
+      </tbody>
+    </table>
+
+    <div class="method-note">
+      <strong>In our project:</strong> Theta-band power has Cohen's d = 0.235 (social &gt; solo) &mdash; a small but real effect. Delta band has d = 0.069. These are modest effect sizes, which makes sense: calcium imaging is a noisy, indirect measure of neural activity, so we'd expect effects to be attenuated compared to electrophysiology.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     A15: Multiple Comparison Correction
+     ============================================================ -->
+<section id="correction">
+  <div class="container reveal">
+    <p class="section-label">A15</p>
+    <h2>Multiple Comparison Correction</h2>
+
+    <h3>The problem: too many tests</h3>
+    <p>
+      If you flip a fair coin 20 times, you'll probably get at least one run of 4 heads in a row &mdash; not because anything special happened, but because you tried enough times. The same problem occurs in statistics: the more tests you run, the more likely you'll get a "significant" result just by chance.
+    </p>
+    <p>
+      We test 4 frequency bands (infraslow, slow, delta, theta) for social vs. solo differences. At a significance level of \( \alpha = 0.05 \), each test has a 5% chance of a false positive. Running 4 tests gives a much higher chance of at least one false positive across the set.
+    </p>
+
+    <h3>Bonferroni correction</h3>
+    <p>
+      The simplest fix is the <strong>Bonferroni correction</strong>: divide the significance threshold by the number of tests:
+    </p>
+    <div class="math-block">
+      $$ \alpha_{\text{corrected}} = \frac{\alpha}{m} $$
+    </div>
+    <p>
+      where \( m \) is the number of tests. For our 4 bands:
+    </p>
+    <div class="math-block">
+      $$ \alpha_{\text{corrected}} = \frac{0.05}{4} = 0.0125 $$
+    </div>
+    <p>
+      A result is only considered significant if its p-value falls below 0.0125. This is conservative (it may miss real effects) but guarantees that the overall false positive rate stays below 5%.
+    </p>
+
+    <div class="method-note">
+      <strong>In our project:</strong> Even with Bonferroni correction (threshold = 0.0125), all 4 bands show significant differences between social and solo epochs (all p &lt; 0.001). Theta has the strongest effect (d = 0.235), confirming it's not a multiple-testing artifact.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     A16: K-Means Clustering
+     ============================================================ -->
+<section id="clustering">
+  <div class="container reveal">
+    <p class="section-label">A16</p>
+    <h2>K-Means Clustering</h2>
+
+    <h3>Finding groups without labels</h3>
+    <p>
+      Classification uses labels to learn ("this is social, this is solo"). <strong>Clustering</strong> is different &mdash; it finds natural groups in the data with <em>no labels at all</em>. We use it to discover whether neurons naturally fall into distinct spectral types based on their frequency content.
+    </p>
+
+    <h3>The input</h3>
+    <p>
+      Each neuron is represented as a 4-dimensional vector of <strong>fractional band powers</strong>: what fraction of its total power falls in the infraslow, slow, delta, and theta bands. These four numbers always sum to 1, and they capture the <em>shape</em> of the neuron's spectrum rather than its overall brightness.
+    </p>
+
+    <h3>How K-Means works</h3>
+    <p>
+      Given \( k \) (the number of clusters to find), K-Means works iteratively:
+    </p>
+    <ol>
+      <li><strong>Initialize:</strong> Randomly place \( k \) "centroids" (cluster centers) in the feature space</li>
+      <li><strong>Assign:</strong> Each neuron is assigned to its nearest centroid using Euclidean distance:
+        <div class="math-block">
+          $$ d(\mathbf{x}, \boldsymbol{\mu}_j) = \sqrt{\sum_{i=1}^{4} (x_i - \mu_{j,i})^2} $$
+        </div>
+        where \( \mathbf{x} \) is a neuron's fractional power vector and \( \boldsymbol{\mu}_j \) is centroid \( j \).
+      </li>
+      <li><strong>Update:</strong> Move each centroid to the mean of all neurons assigned to it:
+        <div class="math-block">
+          $$ \boldsymbol{\mu}_j = \frac{1}{|C_j|} \sum_{\mathbf{x} \in C_j} \mathbf{x} $$
+        </div>
+      </li>
+      <li><strong>Repeat</strong> steps 2&ndash;3 until the centroids stop moving (convergence)</li>
+    </ol>
+
+    <h3>Choosing the right number of clusters</h3>
+    <p>
+      We don't know in advance how many neuron types there are. We tried \( k = 2, 3, 4, 5, 6 \) and evaluated each using the <strong>silhouette score</strong>:
+    </p>
+    <div class="math-block">
+      $$ s(i) = \frac{b(i) - a(i)}{\max\!\big(a(i), b(i)\big)} $$
+    </div>
+    <p>
+      where:
+    </p>
+    <ul>
+      <li>\( a(i) \) = average distance from neuron \( i \) to all other neurons in the <em>same</em> cluster (compactness)</li>
+      <li>\( b(i) \) = average distance from neuron \( i \) to neurons in the <em>nearest other</em> cluster (separation)</li>
+    </ul>
+    <p>
+      The score ranges from &minus;1 to +1: higher means better-separated clusters. We averaged this over all neurons and picked the \( k \) with the highest average.
+    </p>
+
+    <div class="param-box">
+      <strong>Why k = 2?</strong> We didn't hardcode this &mdash; we let the data decide. K-Means was run for k = 2 through 6, and k = 2 consistently achieved the highest silhouette score (~0.399) across all 18 sessions. This means two clusters provide the cleanest separation of neurons by spectral type. Higher values of k split the data into subgroups that aren't well-separated from each other.
+    </div>
+
+    <div class="param-box">
+      <strong>Why 20 random initializations?</strong> K-Means results depend on where the centroids start. A bad starting position can lead to a poor solution (a "local minimum"). By running the algorithm 20 times with different random starting points and keeping the best result, we greatly reduce the chance of getting stuck in a bad solution.
+    </div>
+
+    <div class="method-note">
+      <strong>Results:</strong> The two clusters are:
+      <ul>
+        <li><strong>Cluster 0 (70% of neurons):</strong> Dominated by infraslow and slow power &mdash; these neurons have mostly low-frequency activity</li>
+        <li><strong>Cluster 1 (30% of neurons):</strong> Enriched in delta and theta power (3&times; more than Cluster 0) &mdash; these are the "high-frequency" minority</li>
+      </ul>
+      This 70/30 split is stable across all 18 sessions and different animals.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     A17: Spatial Analysis
+     ============================================================ -->
+<section id="spatial">
+  <div class="container reveal">
+    <p class="section-label">A17</p>
+    <h2>Spatial Analysis</h2>
+
+    <h3>Where are these neurons physically located?</h3>
+    <p>
+      After finding two spectral clusters, a natural question is: are Cluster 1 neurons grouped together in a specific brain subregion, or are they scattered among Cluster 0 neurons? If they're grouped, their spectral identity might be explained by their location (e.g., a different cortical layer). If they're scattered, it suggests an intrinsic cellular property.
+    </p>
+
+    <h3>Centroid extraction</h3>
+    <p>
+      Each neuron has a <strong>spatial footprint</strong> &mdash; a 2D image from the CNMF-E source extraction algorithm showing the neuron's shape in the microscope's field of view. We compute each neuron's <strong>centroid</strong> (center of mass):
+    </p>
+    <div class="math-block">
+      $$ \bar{y} = \frac{\sum_{y,x} y \cdot A(y,x)}{\sum_{y,x} A(y,x)}, \quad \bar{x} = \frac{\sum_{y,x} x \cdot A(y,x)}{\sum_{y,x} A(y,x)} $$
+    </div>
+    <p>
+      where \( A(y,x) \) is the pixel intensity of the neuron's spatial footprint at position \( (y, x) \). This is like finding the "balance point" of the neuron's shape.
+    </p>
+
+    <h3>Nearest-neighbor distances</h3>
+    <p>
+      We compute Euclidean distances between neuron centroids:
+    </p>
+    <div class="math-block">
+      $$ d = \sqrt{(\bar{y}_1 - \bar{y}_2)^2 + (\bar{x}_1 - \bar{x}_2)^2} $$
+    </div>
+    <p>
+      Then we measure two types of nearest-neighbor (NN) distances:
+    </p>
+    <ul>
+      <li><strong>Intra-cluster NN:</strong> Distance from each Cluster 1 neuron to its nearest Cluster 1 neighbor</li>
+      <li><strong>Cross-cluster NN:</strong> Distance from each Cluster 1 neuron to its nearest Cluster 0 neighbor</li>
+    </ul>
+    <p>
+      If Cluster 1 neurons were spatially grouped, we'd expect intra-cluster NN &lt; cross-cluster NN (they'd be closer to each other than to Cluster 0). Instead, we find the opposite: Cluster 1 neurons are <em>intermixed</em> with Cluster 0 throughout the field of view, confirming that their spectral identity is an intrinsic cellular property, not determined by spatial location.
+    </p>
+
+    <h3>Weighted intensity maps</h3>
+    <p>
+      We also created <strong>weighted intensity maps</strong> by overlaying each neuron's spatial footprint, weighted by its delta or theta band power. This visualization shows the spatial distribution of band-specific activity across the entire field of view. Despite Cluster 1's stronger theta content, both clusters contribute to the spatial maps &mdash; further confirming that spectral identity and spatial position are independent.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     Summary
+     ============================================================ -->
+<section class="conclusion">
+  <div class="container reveal">
+    <p class="section-label" style="color: rgba(255,255,255,0.4);">Summary</p>
+    <h2>The Complete Pipeline</h2>
+    <p>
+      Here is the entire analysis pipeline from start to finish:
+    </p>
+    <ol style="color: rgba(255,255,255,0.8); line-height: 2;">
+      <li><strong>Record</strong> calcium fluorescence (30 fps) and behavior video (25 fps)</li>
+      <li><strong>Track</strong> animal poses with SLEAP; define social proximity (&lt; 10 px nose-to-body)</li>
+      <li><strong>Resample</strong> behavior labels from 25 fps to 30 fps (nearest-neighbor)</li>
+      <li><strong>Detrend</strong> calcium traces to remove photobleaching drift</li>
+      <li><strong>Compute</strong> Welch PSD for each neuron (10-second windows, 50% overlap, Hann window)</li>
+      <li><strong>Integrate</strong> PSD within 4 frequency bands (trapezoidal rule)</li>
+      <li><strong>Extract</strong> 6 features per 1-second window (4 band powers + entropy + theta/delta ratio)</li>
+      <li><strong>Classify</strong> social vs. solo using LDA, SVM, Logistic Regression with GroupKFold CV</li>
+      <li><strong>Validate</strong> with permutation testing (100 shuffles)</li>
+      <li><strong>Cluster</strong> neurons by fractional band power (K-Means, k selected by silhouette score)</li>
+      <li><strong>Compare</strong> classification performance across clusters</li>
+      <li><strong>Map</strong> spatial distribution of spectrally defined clusters</li>
+    </ol>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>COGS 118C &middot; UC San Diego &middot; Winter 2026</p>
+</footer>
+
+<!-- Back to top button -->
+<a href="#" class="back-to-top" id="backToTop" title="Back to top">&uarr;</a>
+
+<script>
+/* Scroll-reveal for appendix */
+(function () {
+  'use strict';
+  var elements = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) {
+    elements.forEach(function (el) { el.classList.add('visible'); });
+    return;
+  }
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  elements.forEach(function (el) { observer.observe(el); });
+})();
+
+/* Back to top button */
+(function () {
+  var btn = document.getElementById('backToTop');
+  window.addEventListener('scroll', function () {
+    if (window.scrollY > 600) {
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
+  });
+})();
+</script>
+</body>
+</html>
