@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Appendix: Methods &mdash; Decoding Social Intent from Neural Oscillations</title>
+  <title>Appendix &mdash; Decoding Social Intent from Neural Oscillations</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,700;0,800;1,400&display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
   <div class="nav-inner">
     <span class="nav-title">Neural Oscillations</span>
     <div class="nav-tabs">
-      <a href="index.html" class="nav-tab">Paper</a>
+      <a href="index.html" class="nav-tab">Report</a>
       <a href="appendix.html" class="nav-tab active">Appendix</a>
     </div>
   </div>
@@ -30,38 +30,47 @@
 <!-- Appendix Header -->
 <header class="appendix-header">
   <div class="container">
-    <p class="section-label">Appendix</p>
-    <h1>Methods in Detail</h1>
-    <p class="appendix-subtitle">A complete reference for every method used in this project, explained from first principles.</p>
+    <h1>Appendix</h1>
   </div>
 </header>
 
-<!-- Table of Contents -->
-<section class="toc-section">
+<!-- Three Section Boxes -->
+<section class="section-boxes" id="section-boxes">
   <div class="container">
-    <h2>Table of Contents</h2>
-    <ol class="toc-list">
-      <li><a href="#signals">Neural Signals and Calcium Imaging</a></li>
-      <li><a href="#sampling">Sampling and the Nyquist Limit</a></li>
-      <li><a href="#preprocessing">Preprocessing</a></li>
-      <li><a href="#smi">Social Modulation Index</a></li>
-      <li><a href="#fourier">The Fourier Transform</a></li>
-      <li><a href="#welch">Power Spectral Density: Welch's Method</a></li>
-      <li><a href="#bands">Frequency Bands and Band Power</a></li>
-      <li><a href="#filtering">Bandpass Filtering: Butterworth</a></li>
-      <li><a href="#hilbert">Hilbert Transform and Signal Envelope</a></li>
-      <li><a href="#features">Feature Extraction Pipeline</a></li>
-      <li><a href="#classification">Classification</a></li>
-      <li><a href="#crossval">Cross-Validation</a></li>
-      <li><a href="#permutation">Permutation Testing</a></li>
-      <li><a href="#wilcoxon">Wilcoxon Rank-Sum Test</a></li>
-      <li><a href="#effectsize">Cohen's d Effect Size</a></li>
-      <li><a href="#correction">Multiple Comparison Correction</a></li>
-      <li><a href="#clustering">K-Means Clustering</a></li>
-      <li><a href="#spatial">Spatial Analysis</a></li>
-    </ol>
+    <div class="box-grid">
+      <a href="#group-preprocess" class="section-box box-preprocess">
+        <span class="box-number">I</span>
+        <span class="box-title">Preprocessing</span>
+        <span class="box-range">A1 &ndash; A4</span>
+      </a>
+      <a href="#group-signal" class="section-box box-signal">
+        <span class="box-number">II</span>
+        <span class="box-title">Neural Signal Processing</span>
+        <span class="box-range">A5 &ndash; A9</span>
+      </a>
+      <a href="#group-clustering" class="section-box box-clustering">
+        <span class="box-number">III</span>
+        <span class="box-title">Neural Population Analysis</span>
+        <span class="box-range">A10 &ndash; A13</span>
+      </a>
+      <a href="#group-evaluation" class="section-box box-evaluation">
+        <span class="box-number">IV</span>
+        <span class="box-title">Evaluation</span>
+        <span class="box-range">A14 &ndash; A18</span>
+      </a>
+    </div>
   </div>
 </section>
+
+<!-- ============================================================
+     GROUP I: Preprocessing (A1-A4)
+     ============================================================ -->
+<div class="group-heading" id="group-preprocess">
+  <div class="container">
+    <span class="group-number">I</span>
+    <h2 class="group-title">Preprocessing</h2>
+  </div>
+</div>
 
 <!-- ============================================================
      A1: Neural Signals
@@ -107,7 +116,7 @@
 <section id="preprocessing">
   <div class="container reveal">
     <p class="section-label">A3</p>
-    <h2>Preprocessing</h2>
+    <h2>Data Preprocessing</h2>
 
     <h3>Linear detrending</h3>
     <p>
@@ -176,6 +185,16 @@
 </section>
 
 <!-- ============================================================
+     GROUP II: Neural Signal Processing (A5-A9)
+     ============================================================ -->
+<div class="group-heading" id="group-signal">
+  <div class="container">
+    <span class="group-number">II</span>
+    <h2 class="group-title">Neural Signal Processing</h2>
+  </div>
+</div>
+
+<!-- ============================================================
      A5: The Fourier Transform
      ============================================================ -->
 <section id="fourier">
@@ -198,6 +217,10 @@
       $$ P[k] = |X[k]|^2 = \text{Re}(X[k])^2 + \text{Im}(X[k])^2 $$
     </div>
     <p>Bin \( k \) corresponds to real-world frequency \( f = k \cdot f_s / N \) Hz.</p>
+
+    <div class="method-note">
+      <strong>Role in this project:</strong> The DFT is the mathematical foundation underlying every spectral method we use. We never call it directly &mdash; instead it is invoked inside Welch&rsquo;s method (A6), which applies the FFT to overlapping, windowed segments. Understanding the DFT is essential for interpreting frequency resolution, the Nyquist limit, and why windowing is necessary.
+    </div>
   </div>
 </section>
 
@@ -276,16 +299,7 @@
     </div>
 
     <div class="method-note">
-      <strong>Parameters used:</strong>
-      <ul>
-        <li><strong>Neuron profiling:</strong> \( L = 300 \) (10 s), 50% overlap, FFT size = 1024</li>
-        <li><strong>Windowed classification:</strong> \( L = 30 \) (1 s), 50% overlap, FFT size = 1024</li>
-        <li>Frequency resolution: \( \Delta f = 30/1024 \approx 0.029 \) Hz</li>
-      </ul>
-    </div>
-
-    <div class="param-box">
-      <strong>Why two different segment lengths?</strong> Profiling uses 10-second windows for fine frequency resolution (resolving down to 0.1 Hz). Classification uses 1-second windows to match the behavioral epoch length.
+      <strong>Role in this project:</strong> Welch PSD is the <strong>workhorse of the entire quantitative pipeline</strong>. It is used in two places: (1)&nbsp;neuron spectral profiling &mdash; computing each neuron&rsquo;s full-session PSD to derive fractional band powers for clustering (A17), and (2)&nbsp;per-window feature extraction &mdash; computing PSD within each 1-second epoch to produce the 6 classification features (A10). Every statistical test, effect size, and classification result in the paper traces back to Welch PSD estimates.
     </div>
   </div>
 </section>
@@ -331,6 +345,10 @@
       $$ P_{\text{frac}}^{(\text{band})} = \frac{P_{\text{band}}}{P_{\text{infraslow}} + P_{\text{slow}} + P_{\text{delta}} + P_{\text{theta}}} $$
     </div>
     <p>This yields a value in [0, 1] representing what fraction of the neuron's power resides in each band. Fractional power is used for spectral clustering.</p>
+
+    <div class="method-note">
+      <strong>Role in this project:</strong> Band power integration converts the raw PSD curve into interpretable numbers &mdash; one per frequency band per neuron or window. <strong>Raw band powers</strong> are used as 4 of the 6 classification features (A10) and for the social-vs-solo statistical tests (Figure&nbsp;7). <strong>Fractional band powers</strong> normalize out overall signal brightness, enabling fair comparison across neurons with different firing rates &mdash; these are the inputs to K-means spectral clustering (A17) that discover the two neuron subpopulations.
+    </div>
   </div>
 </section>
 
@@ -416,75 +434,12 @@
     <p>
       The order \( N \) controls how sharply the filter transitions from passband to stopband. Higher orders produce sharper rolloff, but they also introduce more <strong>ringing</strong> (oscillatory artifacts near the edges) and can become numerically unstable. We use order \( N = 4 \):
     </p>
-    <ul>
-      <li>At 1 octave beyond the cutoff, a 4th-order Butterworth suppresses power by a factor of \( 1 + 2^{2 \times 4} = 257 \) (&ndash;24 dB per octave). A frequency twice the theta ceiling (14 Hz) retains less than 0.4% of its original power.</li>
-      <li>Unlike Chebyshev or elliptic designs, the Butterworth has no passband ripple &mdash; the response is monotonically shaped, preserving the true shape of in-band activity.</li>
-    </ul>
-
     <div class="param-box">
       <strong>Why order 4?</strong> Standard choice in neuroscience. Order 2 produces too gentle a rolloff (neighboring bands bleed into each other). Order 6+ can cause numerical errors at very low frequencies like the infraslow band (0.01 Hz). Order 4 provides a sharp enough transition without instability.
     </div>
 
-    <!-- Inline SVG: Zero-phase filtering concept -->
-    <div class="appendix-figure">
-      <svg viewBox="0 0 520 160" width="520" height="160" xmlns="http://www.w3.org/2000/svg" font-family="Inter, sans-serif">
-        <!-- Forward pass -->
-        <rect x="20" y="50" width="120" height="46" rx="6" fill="#ebf5fb" stroke="#2980b9" stroke-width="1.5"/>
-        <text x="80" y="69" text-anchor="middle" font-size="10" fill="#2980b9" font-weight="600">Forward filter</text>
-        <text x="80" y="84" text-anchor="middle" font-size="9" fill="#555">phase shift +&phi;</text>
-        <!-- Arrow -->
-        <line x1="140" y1="73" x2="175" y2="73" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead-zp)"/>
-        <!-- Reverse pass -->
-        <rect x="175" y="50" width="120" height="46" rx="6" fill="#fdf2e9" stroke="#e67e22" stroke-width="1.5"/>
-        <text x="235" y="69" text-anchor="middle" font-size="10" fill="#e67e22" font-weight="600">Backward filter</text>
-        <text x="235" y="84" text-anchor="middle" font-size="9" fill="#555">phase shift -&phi;</text>
-        <!-- Arrow -->
-        <line x1="295" y1="73" x2="330" y2="73" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead-zp)"/>
-        <!-- Result -->
-        <rect x="330" y="50" width="160" height="46" rx="6" fill="#eafaf1" stroke="#27ae60" stroke-width="1.5"/>
-        <text x="410" y="69" text-anchor="middle" font-size="10" fill="#27ae60" font-weight="600">Zero-phase output</text>
-        <text x="410" y="84" text-anchor="middle" font-size="9" fill="#555">+&phi; - &phi; = 0 shift</text>
-        <!-- Input label -->
-        <text x="80" y="38" text-anchor="middle" font-size="9" fill="#888">Raw signal x(t)</text>
-        <line x1="80" y1="42" x2="80" y2="50" stroke="#888" stroke-width="0.8"/>
-        <!-- Magnitude note -->
-        <text x="260" y="125" text-anchor="middle" font-size="9" fill="#555">Magnitude response: |H(f)|&sup2; (sharper rolloff than single pass)</text>
-        <text x="260" y="140" text-anchor="middle" font-size="9" fill="#555">Phase response: exactly zero at all frequencies</text>
-        <!-- Arrowhead definition -->
-        <defs>
-          <marker id="arrowhead-zp" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-            <polygon points="0 0, 8 3, 0 6" fill="#333"/>
-          </marker>
-        </defs>
-      </svg>
-      <p class="appendix-figure-caption"><strong>Figure A3.</strong> Zero-phase filtering applies the filter forward then backward. The opposing phase shifts cancel, preserving temporal alignment with behavior labels.</p>
-    </div>
-
-    <h3>Second-Order Sections (SOS)</h3>
-    <p>
-      A 4th-order filter can be expressed as a single transfer function with 4 poles and 4 zeros. In practice, this representation suffers from <strong>numerical precision errors</strong>: small rounding errors in the polynomial coefficients get amplified, especially when the filter cutoffs are far from the Nyquist frequency (as with the infraslow band at 0.01 Hz vs. Nyquist at 15 Hz).
-    </p>
-    <p>
-      The SOS representation avoids this by <strong>factoring the filter into a cascade of 2nd-order stages</strong>. Each stage is a simple, numerically stable biquad filter. Chaining two biquads together produces the same 4th-order response but without the precision loss. This is why <code>scipy.signal.butter</code> is called with <code>output='sos'</code>.
-    </p>
-
-    <h3>Zero-phase filtering</h3>
-    <p>
-      All causal filters introduce a <strong>phase delay</strong>: the output is shifted in time relative to the input. For our application, this is a problem &mdash; if the filtered theta signal is shifted by even a fraction of a second relative to the behavioral timestamps, we would misattribute activity to the wrong behavioral state.
-    </p>
-    <p>
-      Zero-phase filtering solves this by applying the filter <strong>twice</strong>: once forward in time, then once backward. The forward pass introduces a phase shift; the backward pass introduces the exact opposite phase shift, and the two cancel out. The result is a filtered signal with <strong>no time shift at all</strong>. This is implemented via <code>scipy.signal.sosfiltfilt</code>.
-    </p>
-    <p>
-      The tradeoff: applying the filter twice squares the magnitude response (\( |H|^2 \) instead of \( |H| \)), making the effective rolloff steeper (equivalent to an 8th-order filter in magnitude). This is acceptable because it only makes the band isolation sharper.
-    </p>
-
-    <h3>Frequency normalization</h3>
-    <p>
-      Filter design functions in SciPy expect cutoff frequencies normalized to the Nyquist frequency (0 to 1 scale). For the theta band (4&ndash;7 Hz) with Nyquist = 15 Hz:
-    </p>
-    <div class="math-block">
-      $$ W_n = \left[\frac{4}{15}, \, \frac{7}{15}\right] = [0.267, \, 0.467] $$
+    <div class="method-note">
+      <strong>Role in this project:</strong> Bandpass filtering is used exclusively as a visualization tool, not in the quantitative pipeline. Combined with the Hilbert envelope (A9), it produces the band-decomposed time series in Figure&nbsp;5 &mdash; making it possible to <em>see</em> theta and delta activity rise and fall in lockstep with social contact. This visual evidence was critical for building intuition about which frequency bands carry behavioral information, guiding the quantitative analysis that follows. The classification and clustering pipelines use Welch PSD band power integration (A6&ndash;A7) instead, which summarizes power per window as a single number.
     </div>
   </div>
 </section>
@@ -513,7 +468,7 @@
       $$ A = \sqrt{(A\cos\theta)^2 + (A\sin\theta)^2} = A $$
     </div>
     <p>
-      The squared cosine and squared sine always sum to 1, so the magnitude recovers the amplitude \( A \) regardless of where we are in the oscillation cycle. This is the core idea behind the Hilbert Transform: it generates the 90&deg;-shifted companion signal so that we can compute the amplitude at every time point.
+      The squared cosine and squared sine always sum to 1, so the magnitude recovers the amplitude \( A \) regardless of where we are in the oscillation cycle. The Hilbert transform manufactures that companion signal &mdash; it shifts every frequency component by exactly &minus;90&deg; in phase without changing any amplitudes, so we can compute the amplitude at every time point.
     </p>
 
     <h3>The Hilbert Transform</h3>
@@ -580,12 +535,21 @@
       Taking \( |x(t)| \) directly would produce a bumpy, pulsating curve (flipping negative half-cycles upward) rather than a smooth envelope. The Hilbert approach yields a genuinely smooth curve because the 90&deg; companion fills in the gaps between peaks, providing continuous amplitude information.
     </p>
 
-    <h3>Application in this project</h3>
-    <p>
-      In Figure 5 of the main paper, each frequency band row shows both the bandpass-filtered oscillation and its Hilbert envelope overlaid. The envelope makes it visually clear when theta (or delta, slow, etc.) activity increases during social contact and decreases during solo periods. The envelope is computed via <code>numpy.abs(scipy.signal.hilbert(x))</code>.
-    </p>
+    <div class="method-note">
+      <strong>Role in this project:</strong> Bandpass filtering is used exclusively as a visualization tool, not in the quantitative pipeline. Combined with the Hilbert envelope (A9), it produces the band-decomposed time series in Figure&nbsp;5 &mdash; making it possible to <em>see</em> theta and delta activity rise and fall in lockstep with social contact. This visual evidence was critical for building intuition about which frequency bands carry behavioral information, guiding the quantitative analysis that follows. The classification and clustering pipelines use Welch PSD band power integration (A6&ndash;A7) instead, which summarizes power per window as a single number.
+    </div>
   </div>
 </section>
+
+<!-- ============================================================
+     GROUP III: Neural Population Analysis (A10-A18)
+     ============================================================ -->
+<div class="group-heading" id="group-clustering">
+  <div class="container">
+    <span class="group-number">III</span>
+    <h2 class="group-title">Neural Population Analysis</h2>
+  </div>
+</div>
 
 <!-- ============================================================
      A10: Feature Extraction
@@ -594,6 +558,7 @@
   <div class="container reveal">
     <p class="section-label">A10</p>
     <h2>Feature Extraction Pipeline</h2>
+    <p><strong>Purpose:</strong> Convert raw calcium traces into a compact set of numbers that a classifier can use &mdash; 6 spectral features per 1-second window.</p>
 
     <h3>Windowing and labeling</h3>
     <p>
@@ -607,10 +572,6 @@
 
     <div class="param-box">
       <strong>Why 1-second windows?</strong> This is the shortest window that still permits PSD estimation across all four bands (delta's lowest frequency is 1 Hz, requiring at least one full cycle). Shorter windows degrade frequency resolution; longer windows reduce the number of labeled windows and introduce label ambiguity. This was a practical tradeoff, not formally optimized.
-    </div>
-
-    <div class="param-box">
-      <strong>Why 70% purity?</strong> Windows need reliable labels. At 70%, at least 21 of 30 frames agree on behavioral state. Stricter thresholds (90%) discard too many windows; looser thresholds (60%) include too many mixed-state windows.
     </div>
 
     <h3>Per-window processing</h3>
@@ -650,12 +611,49 @@
 </section>
 
 <!-- ============================================================
-     A11: Classification
+     A11: K-Means Clustering
+     ============================================================ -->
+<section id="clustering">
+  <div class="container reveal">
+    <p class="section-label">A11</p>
+    <h2>K-Means Clustering</h2>
+    <p><strong>Purpose:</strong> Discover whether neurons form distinct spectral subpopulations &mdash; splitting the population before classification reveals a signal that the whole-population average hides.</p>
+    <p>
+      Neurons are clustered by their 4-dimensional fractional band power vectors (infraslow, slow, delta, theta fractions summing to 1). K-Means iterates between two steps until convergence:
+    </p>
+    <ol>
+      <li><strong>Assign</strong> each neuron to its nearest centroid by Euclidean distance:
+        <div class="math-block">
+          $$ d(\mathbf{x}, \boldsymbol{\mu}_j) = \sqrt{\sum_{i=1}^{4} (x_i - \mu_{j,i})^2} $$
+        </div>
+      </li>
+      <li><strong>Update</strong> each centroid to the mean of its assigned neurons:
+        <div class="math-block">
+          $$ \boldsymbol{\mu}_j = \frac{1}{|C_j|} \sum_{\mathbf{x} \in C_j} \mathbf{x} $$
+        </div>
+      </li>
+    </ol>
+
+    <h3>Cluster selection</h3>
+    <p>We evaluated k = 2 through 6 using the <strong>silhouette score</strong>:</p>
+    <div class="math-block">
+      $$ s(i) = \frac{b(i) - a(i)}{\max\!\big(a(i), b(i)\big)} $$
+    </div>
+    <p>
+      where \( a(i) \) = mean intra-cluster distance and \( b(i) \) = mean nearest-cluster distance. Range: [&minus;1, +1]; higher is better. k = 2 consistently achieved the best score (~0.399) across all 18 sessions.
+    </p>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     A12: Classification
      ============================================================ -->
 <section id="classification">
   <div class="container reveal">
-    <p class="section-label">A11</p>
+    <p class="section-label">A12</p>
     <h2>Classification</h2>
+    <p><strong>Purpose:</strong> Test whether spectral features can actually predict social vs. solo behavior &mdash; the classifier is the evaluation tool, not the contribution.</p>
 
     <h3>Standardization</h3>
     <p>Features are z-scored using training-set statistics only:</p>
@@ -676,10 +674,6 @@
       </li>
     </ul>
 
-    <div class="param-box">
-      <strong>Why three classifiers?</strong> Each makes different distributional assumptions. Consistent results across all three indicate robustness. All are linear to avoid overfitting with only 6 features.
-    </div>
-
     <h3>Class balancing</h3>
     <p>Social and solo windows are often imbalanced. Balanced class weights increase the misclassification penalty for the minority class, preventing the classifier from defaulting to the majority label.</p>
 
@@ -691,11 +685,53 @@
 </section>
 
 <!-- ============================================================
-     A12: Cross-Validation
+     A13: Spatial Analysis
+     ============================================================ -->
+<section id="spatial">
+  <div class="container reveal">
+    <p class="section-label">A13</p>
+    <h2>Spatial Analysis</h2>
+    <p><strong>Purpose:</strong> Check whether the two spectral clusters are spatially segregated or intermixed &mdash; ruling out the possibility that cluster identity is just a location artifact.</p>
+
+    <h3>Centroid extraction</h3>
+    <p>Each neuron's spatial footprint (from CNMF-E source extraction) is reduced to a centroid via center of mass:</p>
+    <div class="math-block">
+      $$ \bar{y} = \frac{\sum_{y,x} y \cdot A(y,x)}{\sum_{y,x} A(y,x)}, \quad \bar{x} = \frac{\sum_{y,x} x \cdot A(y,x)}{\sum_{y,x} A(y,x)} $$
+    </div>
+
+    <h3>Nearest-neighbor distances</h3>
+    <p>Euclidean distances between centroids are computed to test spatial organization:</p>
+    <ul>
+      <li><strong>Intra-cluster NN:</strong> distance from each Cluster 1 neuron to its nearest Cluster 1 neighbor</li>
+      <li><strong>Cross-cluster NN:</strong> distance from each Cluster 1 neuron to its nearest Cluster 0 neighbor</li>
+    </ul>
+    <p>
+      If Cluster 1 neurons were spatially grouped, intra-cluster NN would be smaller than cross-cluster NN. The opposite is observed: Cluster 1 neurons are spatially intermixed with Cluster 0, indicating spectral identity is an intrinsic cellular property, not location-dependent.
+    </p>
+
+    <h3>Weighted intensity maps</h3>
+    <p>
+      Each neuron's spatial footprint is weighted by its band power and overlaid to produce maps of the spatial distribution of delta and theta activity across the field of view.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     GROUP IV: Evaluation (A14-A18)
+     ============================================================ -->
+<div class="group-heading" id="group-evaluation">
+  <div class="container">
+    <span class="group-number">IV</span>
+    <h2 class="group-title">Evaluation</h2>
+  </div>
+</div>
+
+<!-- ============================================================
+     A14: Cross-Validation
      ============================================================ -->
 <section id="crossval">
   <div class="container reveal">
-    <p class="section-label">A12</p>
+    <p class="section-label">A14</p>
     <h2>Cross-Validation</h2>
     <p>
       We use <strong>GroupKFold</strong> (5 folds) with recording sessions as groups. In each fold, all windows from a set of sessions are held out for testing while the remaining sessions are used for training. No data from a test session appears during training.
@@ -766,11 +802,11 @@
 </section>
 
 <!-- ============================================================
-     A13: Permutation Testing
+     A15: Permutation Testing
      ============================================================ -->
 <section id="permutation">
   <div class="container reveal">
-    <p class="section-label">A13</p>
+    <p class="section-label">A15</p>
     <h2>Permutation Testing</h2>
     <p>
       A permutation test determines whether classification performance exceeds what would be expected by chance. The procedure:
@@ -785,6 +821,9 @@
       </li>
     </ol>
     <p>If \( p < 0.05 \), the classifier performs significantly better than chance.</p>
+    <p>
+      We run this test three times: once on the full population, and once on each spectral cluster separately. This is the key comparison &mdash; the whole-population classifier fails the permutation test (p&nbsp;=&nbsp;0.196), but the Cluster&nbsp;1 classifier passes (p&nbsp;=&nbsp;0.020), revealing that the social signal is concentrated in the theta-enriched minority rather than spread across all neurons.
+    </p>
 
     <!-- Inline SVG: Permutation testing concept -->
     <div class="appendix-figure">
@@ -837,23 +876,15 @@
       <strong>Why 100 shuffles?</strong> This gives p-value resolution to 0.01, sufficient for significance testing at &alpha; = 0.05. More shuffles (e.g., 1,000) would give finer resolution at 10&times; the computational cost.
     </div>
 
-    <div class="method-note">
-      <strong>Results:</strong>
-      <ul>
-        <li><strong>Cluster 1:</strong> AUC = 0.570, p = 0.020 &rarr; significant</li>
-        <li><strong>All neurons:</strong> AUC = 0.535, p = 0.196 &rarr; not significant</li>
-        <li><strong>Cluster 0:</strong> AUC = 0.519, p = 0.407 &rarr; not significant</li>
-      </ul>
-    </div>
   </div>
 </section>
 
 <!-- ============================================================
-     A14: Wilcoxon Rank-Sum Test
+     A16: Wilcoxon Rank-Sum Test
      ============================================================ -->
 <section id="wilcoxon">
   <div class="container reveal">
-    <p class="section-label">A14</p>
+    <p class="section-label">A16</p>
     <h2>Wilcoxon Rank-Sum Test</h2>
     <p>
       To test whether band power differs between social and solo windows, we use the <strong>Wilcoxon rank-sum test</strong> (also called the Mann-Whitney U test). This is a non-parametric test: it makes no assumptions about the shape of the data distribution, only that the two groups are independent.
@@ -876,11 +907,11 @@
 </section>
 
 <!-- ============================================================
-     A15: Cohen's d
+     A17: Cohen's d
      ============================================================ -->
 <section id="effectsize">
   <div class="container reveal">
-    <p class="section-label">A15</p>
+    <p class="section-label">A17</p>
     <h2>Cohen's d Effect Size</h2>
     <p>
       A p-value indicates whether an effect exists; Cohen's d quantifies its <em>magnitude</em>. It measures the distance between two group means in units of pooled standard deviation:
@@ -903,11 +934,11 @@
 </section>
 
 <!-- ============================================================
-     A16: Multiple Comparison Correction
+     A18: Multiple Comparison Correction
      ============================================================ -->
 <section id="correction">
   <div class="container reveal">
-    <p class="section-label">A16</p>
+    <p class="section-label">A18</p>
     <h2>Multiple Comparison Correction</h2>
     <p>
       Testing 4 frequency bands simultaneously inflates the false-positive rate. The <strong>Bonferroni correction</strong> divides the significance threshold by the number of tests:
@@ -921,104 +952,39 @@
   </div>
 </section>
 
-<!-- ============================================================
-     A17: K-Means Clustering
-     ============================================================ -->
-<section id="clustering">
-  <div class="container reveal">
-    <p class="section-label">A17</p>
-    <h2>K-Means Clustering</h2>
-    <p>
-      Neurons are clustered by their 4-dimensional fractional band power vectors (infraslow, slow, delta, theta fractions summing to 1). K-Means iterates between two steps until convergence:
-    </p>
-    <ol>
-      <li><strong>Assign</strong> each neuron to its nearest centroid by Euclidean distance:
-        <div class="math-block">
-          $$ d(\mathbf{x}, \boldsymbol{\mu}_j) = \sqrt{\sum_{i=1}^{4} (x_i - \mu_{j,i})^2} $$
-        </div>
-      </li>
-      <li><strong>Update</strong> each centroid to the mean of its assigned neurons:
-        <div class="math-block">
-          $$ \boldsymbol{\mu}_j = \frac{1}{|C_j|} \sum_{\mathbf{x} \in C_j} \mathbf{x} $$
-        </div>
-      </li>
-    </ol>
-
-    <h3>Cluster selection</h3>
-    <p>We evaluated k = 2 through 6 using the <strong>silhouette score</strong>:</p>
-    <div class="math-block">
-      $$ s(i) = \frac{b(i) - a(i)}{\max\!\big(a(i), b(i)\big)} $$
-    </div>
-    <p>
-      where \( a(i) \) = mean intra-cluster distance and \( b(i) \) = mean nearest-cluster distance. Range: [&minus;1, +1]; higher is better. k = 2 consistently achieved the best score (~0.399) across all 18 sessions.
-    </p>
-
-    <div class="param-box">
-      <strong>Why 20 random initializations?</strong> K-Means is sensitive to initial centroid placement. Running 20 initializations and keeping the best result reduces the risk of converging to a poor local minimum.
-    </div>
-
-    <div class="method-note">
-      <strong>Results:</strong> Cluster 0 (70%) is dominated by infraslow/slow power. Cluster 1 (30%) has 3&times; more delta+theta power. This split is stable across all sessions and animals.
-    </div>
+<!-- Floating Table of Contents -->
+<nav class="floating-toc" id="floating-toc">
+  <div class="toc-group">
+    <a href="#group-preprocess" class="toc-big" data-group="preprocess">I. Preprocessing</a>
+    <a href="#signals" class="toc-sub" data-group="preprocess">A1. Neural Signals</a>
+    <a href="#sampling" class="toc-sub" data-group="preprocess">A2. Sampling &amp; Nyquist</a>
+    <a href="#preprocessing" class="toc-sub" data-group="preprocess">A3. Data Preprocessing</a>
+    <a href="#smi" class="toc-sub" data-group="preprocess">A4. Social Modulation Index</a>
   </div>
-</section>
-
-<!-- ============================================================
-     A18: Spatial Analysis
-     ============================================================ -->
-<section id="spatial">
-  <div class="container reveal">
-    <p class="section-label">A18</p>
-    <h2>Spatial Analysis</h2>
-
-    <h3>Centroid extraction</h3>
-    <p>Each neuron's spatial footprint (from CNMF-E source extraction) is reduced to a centroid via center of mass:</p>
-    <div class="math-block">
-      $$ \bar{y} = \frac{\sum_{y,x} y \cdot A(y,x)}{\sum_{y,x} A(y,x)}, \quad \bar{x} = \frac{\sum_{y,x} x \cdot A(y,x)}{\sum_{y,x} A(y,x)} $$
-    </div>
-
-    <h3>Nearest-neighbor distances</h3>
-    <p>Euclidean distances between centroids are computed to test spatial organization:</p>
-    <ul>
-      <li><strong>Intra-cluster NN:</strong> distance from each Cluster 1 neuron to its nearest Cluster 1 neighbor</li>
-      <li><strong>Cross-cluster NN:</strong> distance from each Cluster 1 neuron to its nearest Cluster 0 neighbor</li>
-    </ul>
-    <p>
-      If Cluster 1 neurons were spatially grouped, intra-cluster NN would be smaller than cross-cluster NN. The opposite is observed: Cluster 1 neurons are spatially intermixed with Cluster 0, indicating spectral identity is an intrinsic cellular property, not location-dependent.
-    </p>
-
-    <h3>Weighted intensity maps</h3>
-    <p>
-      Each neuron's spatial footprint is weighted by its band power and overlaid to produce maps of the spatial distribution of delta and theta activity across the field of view.
-    </p>
+  <div class="toc-group">
+    <a href="#group-signal" class="toc-big" data-group="signal">II. Signal Processing</a>
+    <a href="#fourier" class="toc-sub" data-group="signal">A5. Fourier Transform</a>
+    <a href="#welch" class="toc-sub" data-group="signal">A6. Welch PSD</a>
+    <a href="#bands" class="toc-sub" data-group="signal">A7. Frequency Bands</a>
+    <a href="#filtering" class="toc-sub" data-group="signal">A8. Bandpass Filtering</a>
+    <a href="#hilbert" class="toc-sub" data-group="signal">A9. Hilbert Transform</a>
   </div>
-</section>
-
-<!-- ============================================================
-     Summary
-     ============================================================ -->
-<section class="conclusion">
-  <div class="container reveal">
-    <p class="section-label" style="color: rgba(255,255,255,0.4);">Summary</p>
-    <h2>Complete Pipeline</h2>
-    <ol style="color: rgba(255,255,255,0.8); line-height: 2;">
-      <li><strong>Record</strong> calcium fluorescence (30 fps) and behavior video (25 fps)</li>
-      <li><strong>Track</strong> poses with SLEAP; label social frames (&lt; 10 px nose-to-body)</li>
-      <li><strong>Resample</strong> behavior labels 25 &rarr; 30 fps (nearest-neighbor)</li>
-      <li><strong>Detrend</strong> calcium traces (linear)</li>
-      <li><strong>Compute</strong> Welch PSD (10 s windows for profiling, 1 s for classification)</li>
-      <li><strong>Integrate</strong> PSD into 4 frequency bands (trapezoidal rule)</li>
-      <li><strong>Extract</strong> 6 features per 1 s window</li>
-      <li><strong>Test</strong> band power differences (Wilcoxon rank-sum, Bonferroni correction)</li>
-      <li><strong>Quantify</strong> effect sizes (Cohen's d) and social modulation (SMI with BH-FDR)</li>
-      <li><strong>Classify</strong> social vs. solo (LDA, SVM, LogReg; GroupKFold CV)</li>
-      <li><strong>Validate</strong> via permutation testing (100 shuffles)</li>
-      <li><strong>Cluster</strong> neurons by fractional band power (K-Means, k by silhouette)</li>
-      <li><strong>Compare</strong> classification across clusters</li>
-      <li><strong>Map</strong> spatial distribution of spectral clusters</li>
-    </ol>
+  <div class="toc-group">
+    <a href="#group-clustering" class="toc-big" data-group="clustering">III. Population Analysis</a>
+    <a href="#features" class="toc-sub" data-group="clustering">A10. Feature Extraction</a>
+    <a href="#clustering" class="toc-sub" data-group="clustering">A11. K-Means Clustering</a>
+    <a href="#classification" class="toc-sub" data-group="clustering">A12. Classification</a>
+    <a href="#spatial" class="toc-sub" data-group="clustering">A13. Spatial Analysis</a>
   </div>
-</section>
+  <div class="toc-group">
+    <a href="#group-evaluation" class="toc-big" data-group="evaluation">IV. Evaluation</a>
+    <a href="#crossval" class="toc-sub" data-group="evaluation">A14. Cross-Validation</a>
+    <a href="#permutation" class="toc-sub" data-group="evaluation">A15. Permutation Testing</a>
+    <a href="#wilcoxon" class="toc-sub" data-group="evaluation">A16. Wilcoxon Test</a>
+    <a href="#effectsize" class="toc-sub" data-group="evaluation">A17. Cohen&rsquo;s d</a>
+    <a href="#correction" class="toc-sub" data-group="evaluation">A18. Multiple Corrections</a>
+  </div>
+</nav>
 
 <!-- Footer -->
 <footer>
@@ -1046,11 +1012,71 @@
   }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
   elements.forEach(function (el) { observer.observe(el); });
 })();
+
+/* Back to top */
 (function () {
   var btn = document.getElementById('backToTop');
   window.addEventListener('scroll', function () {
     btn.classList.toggle('visible', window.scrollY > 600);
   });
+})();
+
+/* Floating TOC: fade in after scrolling past the section boxes, highlight active section */
+(function () {
+  'use strict';
+  var toc = document.getElementById('floating-toc');
+  var boxes = document.getElementById('section-boxes');
+  if (!toc || !boxes) return;
+
+  /* Collect all section IDs and their TOC links */
+  var tocLinks = toc.querySelectorAll('a[href^="#"]');
+  var sectionIds = [];
+  tocLinks.forEach(function (a) {
+    var id = a.getAttribute('href').substring(1);
+    if (document.getElementById(id)) sectionIds.push(id);
+  });
+
+  /* Show/hide TOC based on scroll position past the boxes */
+  var tocVisible = false;
+  function updateTocVisibility() {
+    var boxesBottom = boxes.getBoundingClientRect().bottom;
+    var shouldShow = boxesBottom < 0;
+    if (shouldShow !== tocVisible) {
+      tocVisible = shouldShow;
+      toc.classList.toggle('visible', shouldShow);
+    }
+  }
+
+  /* Highlight the current section in the TOC */
+  function updateActiveSection() {
+    var current = null;
+    var scrollY = window.scrollY + 120;
+    for (var i = sectionIds.length - 1; i >= 0; i--) {
+      var el = document.getElementById(sectionIds[i]);
+      if (el && el.offsetTop <= scrollY) {
+        current = sectionIds[i];
+        break;
+      }
+    }
+    tocLinks.forEach(function (a) {
+      var id = a.getAttribute('href').substring(1);
+      a.classList.toggle('active', id === current);
+    });
+  }
+
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (!ticking) {
+      requestAnimationFrame(function () {
+        updateTocVisibility();
+        updateActiveSection();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+  updateTocVisibility();
+  updateActiveSection();
 })();
 </script>
 </body>

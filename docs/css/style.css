@@ -706,55 +706,192 @@ footer a {
 }
 
 .appendix-header h1 {
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
   font-weight: 800;
   letter-spacing: -0.02em;
-  margin-bottom: 0.5em;
+  margin-bottom: 0;
   color: #fff;
 }
 
-.appendix-subtitle {
-  font-family: 'Inter', sans-serif;
-  font-size: clamp(0.85rem, 1.8vw, 1.05rem);
-  color: rgba(255, 255, 255, 0.6);
-  max-width: 600px;
-  margin: 0 auto;
-  line-height: 1.6;
-}
-
-/* Table of Contents */
-.toc-section {
+/* --- Section Boxes (clickable cards) --- */
+.section-boxes {
   background: var(--bg-alt);
   padding: 3rem 0;
 }
 
-.toc-section h2 {
-  font-size: 1.3rem;
-  margin-bottom: 1em;
+.box-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.2rem;
 }
 
-.toc-list {
-  padding-left: 1.4em;
-  columns: 2;
-  column-gap: 2rem;
-  line-height: 2.2;
+.section-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem 1.2rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  cursor: pointer;
 }
 
-.toc-list li {
-  break-inside: avoid;
-}
-
-.toc-list a {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.88rem;
-  color: var(--text-light);
-  border-bottom: 1px solid transparent;
-  transition: color 0.2s, border-color 0.2s;
-}
-
-.toc-list a:hover {
-  color: var(--accent);
+.section-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: var(--accent);
   border-bottom-color: var(--accent);
+}
+
+.box-number {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.4em;
+  display: block;
+}
+
+.box-title {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.3em;
+  display: block;
+}
+
+.box-range {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  display: block;
+}
+
+/* --- Group Headings --- */
+.group-heading {
+  background: var(--hero-bg);
+  color: #fff;
+  padding: 3rem 0 2rem;
+  text-align: center;
+  scroll-margin-top: 60px;
+}
+
+.group-number {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 0.4em;
+}
+
+.group-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0;
+}
+
+/* --- Floating Table of Contents --- */
+.floating-toc {
+  position: fixed;
+  top: 60px;
+  left: 16px;
+  width: 200px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  z-index: 9990;
+  opacity: 0;
+  transform: translateX(-12px);
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.8em 0.6em;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.floating-toc.visible {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.floating-toc .toc-group {
+  margin-bottom: 0.6em;
+  padding-bottom: 0.6em;
+  border-bottom: 1px solid var(--border);
+}
+
+.floating-toc .toc-group:last-child {
+  border-bottom: none;
+}
+
+.floating-toc a {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  text-decoration: none;
+  border-bottom: none;
+  border-radius: 3px;
+  transition: color 0.15s, background 0.15s;
+  line-height: 1.4;
+}
+
+.floating-toc a:hover {
+  border-bottom: none;
+}
+
+.floating-toc .toc-big {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text);
+  padding: 0.35em 0.5em;
+  margin-bottom: 0.15em;
+  letter-spacing: 0.02em;
+}
+
+.floating-toc .toc-big:hover {
+  color: var(--accent);
+  background: rgba(52, 152, 219, 0.06);
+}
+
+.floating-toc .toc-big.active {
+  color: var(--accent);
+}
+
+.floating-toc .toc-sub {
+  font-size: 0.66rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  padding: 0.2em 0.5em 0.2em 1.1em;
+}
+
+.floating-toc .toc-sub:hover {
+  color: var(--accent);
+  background: rgba(52, 152, 219, 0.04);
+}
+
+.floating-toc .toc-sub.active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Scrollbar styling for the floating TOC */
+.floating-toc::-webkit-scrollbar {
+  width: 3px;
+}
+
+.floating-toc::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
 }
 
 /* Method Note Callout */
@@ -908,13 +1045,24 @@ footer a {
 }
 
 /* Responsive appendix */
-@media (max-width: 768px) {
-  .toc-list {
-    columns: 1;
+@media (max-width: 1100px) {
+  .floating-toc {
+    display: none;
   }
+}
 
+@media (max-width: 768px) {
   .appendix-header {
     padding: 4rem 0 2rem;
+  }
+
+  .box-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+  }
+
+  .section-box {
+    padding: 1.4rem 1rem;
   }
 
   .method-table {
