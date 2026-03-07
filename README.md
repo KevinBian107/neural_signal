@@ -3,6 +3,9 @@
 ## Research Question
 
 Can we classify whether an animal is interacting socially vs. exploring alone based on the spectral features of its neural calcium signals?
+- **Band–Behavior Link:** Do specific frequency bands of the calcium signal differentiate social from solo epochs?
+- **Neuron–Band Heterogeneity:** Do neurons split into subpopulations with distinct spectral profiles?
+- **Subpopulation Classification:** Does a spectrally defined subpopulation drive behavior classification?
 
 ## Key Findings
 
